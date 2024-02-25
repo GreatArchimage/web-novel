@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: web-novel
+  jackson:
+    generator:
+      write-numbers-as-strings: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+  datasource:
+    url: jdbc:mysql://172.31.86.74:3306/web_novel?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+  data:
+    redis:
+      host: 172.31.86.74
+      port: 6379
+  web:
+    resources:
+      static-locations: file:D:/temp/novel/upload/
+
+server:
+  port: 9888
+
+--- #---------------------自定义配置----------------------------
+novel:
+  # 跨域配置
+  cors:
+    # 允许跨域的域名
+    allow-origins:
+      - http://localhost:1024
+      - http://localhost:1027
+      - http://localhost:3000
+      - http://localhost:3001
+  jwt:
+    secret: E66559580A1ADF48CDD928516062F12E
+  file:
+    # 文件上传配置
+    upload:
+      # 上传路径
+      path: D:/temp/novel/upload
