@@ -22,6 +22,10 @@ spring:
 server:
   port: 9888
 
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
 --- #---------------------自定义配置----------------------------
 novel:
   # 跨域配置

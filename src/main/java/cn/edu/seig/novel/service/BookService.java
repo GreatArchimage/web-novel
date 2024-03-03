@@ -1,6 +1,8 @@
 package cn.edu.seig.novel.service;
 
 import cn.edu.seig.novel.common.http.Result;
+import cn.edu.seig.novel.common.utils.PageReqParams;
+import cn.edu.seig.novel.dao.entity.BookChapter;
 import cn.edu.seig.novel.dao.entity.BookInfo;
 
 import java.security.NoSuchAlgorithmException;
@@ -39,6 +41,12 @@ public interface BookService {
     Result listBooks();
 
     Result saveBook(BookInfo newBook);
+
+    Result listBookChapters(Long bookId, PageReqParams params);
+
+    Result saveBookChapter(BookChapter newChapter);
+
+    Result updateBookChapter(Long chapterId, BookChapter chapter);
 
 //    /**
 //     * 小说内容相关信息查询
