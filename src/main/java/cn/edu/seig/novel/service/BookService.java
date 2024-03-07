@@ -48,21 +48,8 @@ public interface BookService {
 
     Result updateBookChapter(Long chapterId, BookChapter chapter);
 
-//    /**
-//     * 小说内容相关信息查询
-//     *
-//     * @param chapterId 章节ID
-//     * @return 内容相关联的信息
-//     */
-//    Result getBookContentAbout(Long chapterId);
-//
-//    /**
-//     * 小说最新章节相关信息查询
-//     *
-//     * @param bookId 小说ID
-//     * @return 章节相关联的信息
-//     */
-//    Result<BookChapterAboutRespDto> getLastChapterAbout(Long bookId);
+    Result listCategory(Integer workDirection);
+
 //
 //    /**
 //     * 小说推荐列表查询
@@ -72,13 +59,19 @@ public interface BookService {
 //     */
 //    Result<List<BookInfoRespDto>> listRecBooks(Long bookId) throws NoSuchAlgorithmException;
 //
-//    /**
-//     * 增加小说点击量
-//     *
-//     * @param bookId 小说ID
-//     * @return 成功状态
-//     */
-//    Result<Void> addVisitCount(Long bookId);
+    /**
+     * 增加小说点击量
+     *
+     * @param bookId 小说ID
+     * @return 成功状态
+     */
+    Result addVisitCount(Long bookId);
+
+    Result listRecBooks(Long bookId);
+
+    Result getLastChapterAbout(Long bookId);
+
+    Result listNewestComments(Long bookId);
 //
 //    /**
 //     * 获取上一章节ID

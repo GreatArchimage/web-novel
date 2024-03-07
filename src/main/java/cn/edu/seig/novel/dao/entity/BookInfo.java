@@ -13,7 +13,7 @@ public class BookInfo implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    private Integer targetDirection;
+    private Integer workDirection;
 
     private Long categoryId;
 
@@ -57,12 +57,12 @@ public class BookInfo implements Serializable {
         this.id = id;
     }
 
-    public Integer getTargetDirection() {
-        return targetDirection;
+    public Integer getWorkDirection() {
+        return workDirection;
     }
 
-    public void setTargetDirection(Integer targetDirection) {
-        this.targetDirection = targetDirection;
+    public void setWorkDirection(Integer workDirection) {
+        this.workDirection = workDirection;
     }
 
     public Long getCategoryId() {
@@ -205,7 +205,7 @@ public class BookInfo implements Serializable {
     public String toString() {
         return "BookInfo{" +
                 "id=" + id +
-                ", targetDirection=" + targetDirection +
+                ", workDirection=" + workDirection +
                 ", categoryId=" + categoryId +
                 ", categoryName='" + categoryName + '\'' +
                 ", picUrl='" + picUrl + '\'' +

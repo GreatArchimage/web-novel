@@ -2,6 +2,8 @@ package cn.edu.seig.novel.controller.front;
 
 import cn.edu.seig.novel.common.http.Result;
 import cn.edu.seig.novel.service.BookService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,29 +17,27 @@ public class BookController {
 
     private final BookService bookService;
 
-//    @GetMapping("category/list")
-//    public Result listCategory(Integer workDirection) {
-//        return bookService.listCategory(workDirection);
-//    }
+    @GetMapping("category/list")
+    public Result listCategory(Integer workDirection) {
+        System.out.println(workDirection);
+        return bookService.listCategory(workDirection);
+    }
 
-//    /**
-//     * 小说信息查询接口
-//     */
-//    @Operation(summary = "小说信息查询接口")
-//    @GetMapping("{id}")
-//    public RestResp<BookInfoRespDto> getBookById(
-//        @Parameter(description = "小说 ID") @PathVariable("id") Long bookId) {
-//        return bookService.getBookById(bookId);
-//    }
-//
-//    /**
-//     * 增加小说点击量接口
-//     */
-//    @Operation(summary = "增加小说点击量接口")
-//    @PostMapping("visit")
-//    public RestResp<Void> addVisitCount(@Parameter(description = "小说ID") Long bookId) {
-//        return bookService.addVisitCount(bookId);
-//    }
+    /**
+     * 小说信息查询接口
+     */
+    @GetMapping("{id}")
+    public Result getBookById(@PathVariable("id") Long bookId) {
+        return bookService.getBookById(bookId);
+    }
+
+    /**
+     * 增加小说点击量接口
+     */
+    @PostMapping("visit")
+    public Result addVisitCount(Long bookId) {
+        return bookService.addVisitCount(bookId);
+    }
 //
 //    /**
 //     * 小说最新章节相关信息查询接口
@@ -49,15 +49,13 @@ public class BookController {
 //        return bookService.getLastChapterAbout(bookId);
 //    }
 //
-//    /**
-//     * 小说推荐列表查询接口
-//     */
-//    @Operation(summary = "小说推荐列表查询接口")
-//    @GetMapping("rec_list")
-//    public RestResp<List<BookInfoRespDto>> listRecBooks(
-//        @Parameter(description = "小说ID") Long bookId) throws NoSuchAlgorithmException {
-//        return bookService.listRecBooks(bookId);
-//    }
+    /**
+     * 小说推荐列表查询接口
+     */
+    @GetMapping("rec_list")
+    public Result listRecBooks(Long bookId){
+        return bookService.listRecBooks(bookId);
+    }
 //
 //    /**
 //     * 小说章节列表查询接口
@@ -126,13 +124,19 @@ public class BookController {
     }
 
     /**
+     * 小说最新章节相关信息查询接口
+     */
+    @GetMapping("last_chapter/about")
+    public Result getLastChapterAbout(Long bookId) {
+        return bookService.getLastChapterAbout(bookId);
+    }
+
+    /**
      * 小说最新评论查询接口
      */
-//    @Operation(summary = "小说最新评论查询接口")
-//    @GetMapping("comment/newest_list")
-//    public RestResp<BookCommentRespDto> listNewestComments(
-//        @Parameter(description = "小说ID") Long bookId) {
-//        return bookService.listNewestComments(bookId);
-//    }
+    @GetMapping("comment/newest_list")
+    public Result listNewestComments(Long bookId) {
+        return bookService.listNewestComments(bookId);
+    }
 
 }

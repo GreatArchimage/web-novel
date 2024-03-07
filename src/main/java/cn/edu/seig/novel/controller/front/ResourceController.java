@@ -2,6 +2,7 @@ package cn.edu.seig.novel.controller.front;
 
 import cn.edu.seig.novel.common.http.Result;
 import cn.edu.seig.novel.service.ResourceService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,11 +19,10 @@ public class ResourceController {
     /**
      * 获取图片验证码接口
      */
-//    @Operation(summary = "获取图片验证码接口")
-//    @GetMapping("img_verify_code")
-//    public RestResp<ImgVerifyCodeRespDto> getImgVerifyCode() throws IOException {
-//        return resourceService.getImgVerifyCode();
-//    }
+    @GetMapping("img_verify_code")
+    public Result getImgVerifyCode() throws IOException {
+        return resourceService.getImgVerifyCode();
+    }
 
     /**
      * 图片上传接口

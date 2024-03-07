@@ -1,11 +1,9 @@
 package cn.edu.seig.novel.dao.mapper;
 
 import cn.edu.seig.novel.dao.entity.BookInfo;
+import cn.edu.seig.novel.dto.BookSearchReqDto;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-//import io.github.xxyopen.novel.dao.entity.BookInfo;
-//import io.github.xxyopen.novel.dto.req.BookSearchReqDto;
-//import io.github.xxyopen.novel.dto.resp.BookInfoRespDto;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -26,6 +24,6 @@ public interface BookInfoMapper extends BaseMapper<BookInfo> {
      * @param condition 搜索条件
      * @return 返回结果
      * */
-//    List<BookInfo> searchBooks(IPage<BookInfoRespDto> page, BookSearchReqDto condition);
+    List<BookInfo> searchBooks(IPage<BookInfo> page, BookSearchReqDto condition);
 
 }

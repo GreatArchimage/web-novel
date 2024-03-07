@@ -11,7 +11,7 @@ public class BookCategory implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    private Integer targetDirection;
+    private Integer workDirection;
 
     private String name;
 
@@ -29,12 +29,12 @@ public class BookCategory implements Serializable {
         this.id = id;
     }
 
-    public Integer getTargetDirection() {
-        return targetDirection;
+    public Integer getWorkDirection() {
+        return workDirection;
     }
 
-    public void setTargetDirection(Integer targetDirection) {
-        this.targetDirection = targetDirection;
+    public void setWorkDirection(Integer workDirection) {
+        this.workDirection = workDirection;
     }
 
     public String getName() {
@@ -73,7 +73,7 @@ public class BookCategory implements Serializable {
     public String toString() {
         return "BookCategory{" +
                 "id=" + id +
-                ", targetDirection=" + targetDirection +
+                ", workDirection=" + workDirection +
                 ", name='" + name + '\'' +
                 ", sort=" + sort +
                 ", createTime=" + createTime +

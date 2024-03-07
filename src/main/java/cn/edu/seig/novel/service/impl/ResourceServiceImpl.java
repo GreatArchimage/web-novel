@@ -1,6 +1,8 @@
 package cn.edu.seig.novel.service.impl;
 
 import cn.edu.seig.novel.common.http.Result;
+import cn.edu.seig.novel.common.utils.ImgVerifyCodeUtils;
+import cn.edu.seig.novel.dto.resp.ImgVerifyCodeRespDto;
 import cn.edu.seig.novel.service.ResourceService;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +26,14 @@ public class ResourceServiceImpl implements ResourceService {
     private String fileUploadPath;
     @Override
     public Result getImgVerifyCode() throws IOException {
-        return null;
+        String sessionId = IdWorker.get32UUID();
+        String verifyCode = ImgVerifyCodeUtils.getRandomVerifyCode(4);
+        String img = ImgVerifyCodeUtils.genVerifyCodeImg(verifyCode);
+        //TODO 将验证码存入redis中
+        return Result.success(ImgVerifyCodeRespDto.builder()
+                .sessionId(sessionId)
+                .img(img)
+                .build());
     }
 
     @Override

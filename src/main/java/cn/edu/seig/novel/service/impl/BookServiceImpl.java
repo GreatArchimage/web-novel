@@ -3,10 +3,11 @@ package cn.edu.seig.novel.service.impl;
 import cn.edu.seig.novel.common.http.Result;
 import cn.edu.seig.novel.common.utils.PageReqParams;
 import cn.edu.seig.novel.common.utils.PageResp;
-import cn.edu.seig.novel.dao.entity.BookChapter;
-import cn.edu.seig.novel.dao.entity.BookInfo;
-import cn.edu.seig.novel.dao.mapper.BookChapterMapper;
-import cn.edu.seig.novel.dao.mapper.BookInfoMapper;
+import cn.edu.seig.novel.dao.entity.*;
+import cn.edu.seig.novel.dao.mapper.*;
+import cn.edu.seig.novel.dto.resp.BookChapterAboutRespDto;
+import cn.edu.seig.novel.dto.resp.BookCommentRespDto;
+import cn.edu.seig.novel.dto.resp.BookInfoRespDto;
 import cn.edu.seig.novel.service.BookService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -15,7 +16,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +30,12 @@ public class BookServiceImpl implements BookService {
     private final BookInfoMapper bookInfoMapper;
 
     private final BookChapterMapper bookChapterMapper;
+
+    private final BookCategoryMapper bookCategoryMapper;
+
+    private final BookCommentMapper bookCommentMapper;
+
+    private final UserInfoMapper userInfoMapper;
 
     @Override
     public Result listVisitRankBooks() {
@@ -50,7 +62,31 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Result getBookById(Long bookId) {
-        return null;
+        BookInfo bookInfo = bookInfoMapper.selectById(bookId);
+        QueryWrapper<BookChapter> queryWrapper = new QueryWrapper<>();
+        queryWrapper
+                .eq("book_id", bookId)
+                .orderByAsc("chapter_num")
+                .last("limit 1");
+        BookChapter firstBookChapter = bookChapterMapper.selectOne(queryWrapper);
+        // 组装响应对象
+        BookInfoRespDto bookInfoRespDto = BookInfoRespDto.builder()
+                .id(bookInfo.getId())
+                .bookName(bookInfo.getBookName())
+                .intro(bookInfo.getIntro())
+                .bookStatus(bookInfo.getBookStatus())
+                .authorId(bookInfo.getAuthorId())
+                .authorName(bookInfo.getAuthorName())
+                .categoryId(bookInfo.getCategoryId())
+                .categoryName(bookInfo.getCategoryName())
+                .commentCount(bookInfo.getCommentCount())
+                .firstChapterId(firstBookChapter.getId())
+                .lastChapterId(bookInfo.getLastChapterId())
+                .picUrl(bookInfo.getPicUrl())
+                .visitCount(bookInfo.getVisitCount())
+                .wordCount(bookInfo.getWordCount())
+                .build();
+        return Result.success(bookInfoRespDto);
     }
 
     @Override
@@ -149,5 +185,98 @@ public class BookServiceImpl implements BookService {
         }
         bookInfoMapper.updateById(bookInfo);
         return Result.success();
+    }
+
+    @Override
+    public Result listCategory(Integer workDirection) {
+
+        QueryWrapper<BookCategory> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("work_direction", workDirection);
+        return Result.success(bookCategoryMapper.selectList(queryWrapper));
+    }
+
+    @Override
+    public Result addVisitCount(Long bookId) {
+        bookInfoMapper.addVisitCount(bookId);
+        return Result.success();
+    }
+
+    @Override
+    public Result listRecBooks(Long bookId) {
+        //随机推荐4本小说
+        QueryWrapper<BookInfo> bookInfoQueryWrapper = new QueryWrapper<>();
+        bookInfoQueryWrapper.ne("id", bookId)
+                .orderByAsc("rand()")
+                .last("limit 4");
+        return Result.success(bookInfoMapper.selectList(bookInfoQueryWrapper));
+    }
+
+    @Override
+    public Result getLastChapterAbout(Long bookId) {
+        QueryWrapper<BookChapter> bookChapterQueryWrapper = new QueryWrapper<>();
+        bookChapterQueryWrapper.eq("book_id", bookId)
+                .orderByDesc("chapter_num")
+                .last("limit 1");
+        BookChapter lastChapter = bookChapterMapper.selectOne(bookChapterQueryWrapper);
+        // 查询章节总数
+        bookChapterQueryWrapper.clear();
+        bookChapterQueryWrapper.eq("book_id", bookId);
+        Long chapterTotal = bookChapterMapper.selectCount(bookChapterQueryWrapper);
+
+        BookChapterAboutRespDto bookChapterAboutRespDto = new BookChapterAboutRespDto();
+        bookChapterAboutRespDto.setChapterInfo(lastChapter);
+        bookChapterAboutRespDto.setChapterTotal(chapterTotal);
+        int chapterContentLength = lastChapter.getChapterContent().length();
+
+        if(chapterContentLength<30){
+            bookChapterAboutRespDto.setContentSummary(lastChapter.getChapterContent());
+        }else{
+            bookChapterAboutRespDto.setContentSummary(lastChapter.getChapterContent().substring(0, 30));
+        }
+        return Result.success(bookChapterAboutRespDto);
+    }
+
+    @Override
+    public Result listNewestComments(Long bookId) {
+        QueryWrapper<BookComment> commentCountQueryWrapper = new QueryWrapper<>();
+        commentCountQueryWrapper.eq("book_id", bookId);
+        Long commentTotal = bookCommentMapper.selectCount(commentCountQueryWrapper);
+        BookCommentRespDto bookCommentRespDto = new BookCommentRespDto();
+        bookCommentRespDto.setCommentTotal(commentTotal);
+        if(commentTotal == 0){
+            bookCommentRespDto.setComments(new ArrayList<>());
+//            return Result.success("暂无评论");
+        }
+
+        QueryWrapper<BookComment> commentQueryWrapper = new QueryWrapper<>();
+        commentQueryWrapper.eq("book_id", bookId)
+                .orderByDesc("create_time")
+                .last("limit 5");
+        List<BookComment> bookComments = bookCommentMapper.selectList(commentQueryWrapper);
+        //查询评论用户信息
+        List<Long> userIds = new ArrayList<>();
+        for (BookComment bookComment : bookComments) {
+            Long userId = bookComment.getUserId();
+            userIds.add(userId);
+        }
+        List<UserInfo> userInfos = new ArrayList<>();
+        if(userIds.size() > 0){
+            QueryWrapper<UserInfo> userInfoQueryWrapper = new QueryWrapper<>();
+            userInfoQueryWrapper.in("id", userIds);
+            userInfos = userInfoMapper.selectList(userInfoQueryWrapper);
+        }
+
+        Map<Long, UserInfo> userInfoMap = userInfos.stream().collect(Collectors.toMap(UserInfo::getId, Function.identity()));
+        List<BookCommentRespDto.CommentInfo> commentInfos = bookComments.stream().map(v ->
+            BookCommentRespDto.CommentInfo.builder()
+                    .id(v.getId())
+                    .commentUserId(v.getUserId())
+                    .commentUser(userInfoMap.get(v.getUserId()).getUsername())
+                    .commentUserPhoto(userInfoMap.get(v.getUserId()).getUserPhoto())
+                    .commentContent(v.getCommentContent())
+                    .commentTime(v.getCreateTime())
+                    .build()).toList();
+        bookCommentRespDto.setComments(commentInfos);
+        return Result.success(bookCommentRespDto);
     }
 }

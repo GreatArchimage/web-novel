@@ -1,6 +1,8 @@
 package cn.edu.seig.novel.service;
 
 import cn.edu.seig.novel.common.http.Result;
+import cn.edu.seig.novel.dao.entity.UserInfo;
+import cn.edu.seig.novel.dto.UserRegisterReqDto;
 
 public interface UserService {
 
@@ -12,4 +14,8 @@ public interface UserService {
      * @return 用户信息
      */
     Result getUserInfo(Long userId);
+
+    Result register(UserRegisterReqDto dto);
+
+    Result login(UserInfo userInfo);
 }
