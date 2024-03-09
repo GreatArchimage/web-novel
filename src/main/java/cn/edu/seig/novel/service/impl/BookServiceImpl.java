@@ -7,13 +7,16 @@ import cn.edu.seig.novel.dao.entity.*;
 import cn.edu.seig.novel.dao.mapper.*;
 import cn.edu.seig.novel.dto.resp.BookChapterAboutRespDto;
 import cn.edu.seig.novel.dto.resp.BookCommentRespDto;
+import cn.edu.seig.novel.dto.resp.BookContentAboutRespDto;
 import cn.edu.seig.novel.dto.resp.BookInfoRespDto;
 import cn.edu.seig.novel.service.BookService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,6 +39,8 @@ public class BookServiceImpl implements BookService {
     private final BookCommentMapper bookCommentMapper;
 
     private final UserInfoMapper userInfoMapper;
+
+    private final UserBookshelfMapper userBookshelfMapper;
 
     @Override
     public Result listVisitRankBooks() {
@@ -278,5 +283,129 @@ public class BookServiceImpl implements BookService {
                     .build()).toList();
         bookCommentRespDto.setComments(commentInfos);
         return Result.success(bookCommentRespDto);
+    }
+
+    @Override
+    public Result getBookContentAbout(Long chapterId) {
+        BookChapter bookChapter = bookChapterMapper.selectById(chapterId);
+        BookInfo bookInfo = bookInfoMapper.selectById(bookChapter.getBookId());
+        return Result.success(BookContentAboutRespDto.builder()
+                .bookInfo(bookInfo)
+                .bookContent(bookChapter.getChapterContent())
+                .chapterInfo(bookChapter).build());
+    }
+
+    @Override
+    public Result listChapters(Long bookId) {
+        QueryWrapper<BookChapter> bookChapterQueryWrapper = new QueryWrapper<>();
+        bookChapterQueryWrapper.eq("book_id", bookId)
+                .orderByAsc("chapter_num");
+        List<BookChapter> bookChapters = bookChapterMapper.selectList(bookChapterQueryWrapper);
+        return Result.success(bookChapters);
+    }
+
+    @Override
+    public Result getPreChapterId(Long chapterId) {
+        // 查询当前章节信息
+        BookChapter bookChapter = bookChapterMapper.selectById(chapterId);
+        // 根据当前章节的章节号查询上一章节的id
+        QueryWrapper<BookChapter> bookChapterQueryWrapper = new QueryWrapper<>();
+        bookChapterQueryWrapper.eq("book_id", bookChapter.getBookId())
+                .lt("chapter_num", bookChapter.getChapterNum())
+                .orderByDesc("chapter_num")
+                .last("limit 1");
+        BookChapter preChapter = bookChapterMapper.selectOne(bookChapterQueryWrapper);
+        if (preChapter == null) {
+            return Result.fail("已经是第一章了");
+        }
+        return Result.success(preChapter.getId());
+    }
+
+    @Override
+    public Result getNextChapterId(Long chapterId) {
+        // 查询当前章节信息
+        BookChapter bookChapter = bookChapterMapper.selectById(chapterId);
+        // 根据当前章节的章节号查询下一章节的id
+        QueryWrapper<BookChapter> bookChapterQueryWrapper = new QueryWrapper<>();
+        bookChapterQueryWrapper.eq("book_id", bookChapter.getBookId())
+                .gt("chapter_num", bookChapter.getChapterNum())
+                .orderByAsc("chapter_num")
+                .last("limit 1");
+        BookChapter nextChapter = bookChapterMapper.selectOne(bookChapterQueryWrapper);
+        if (nextChapter == null) {
+            return Result.fail("已经是最后一章了");
+        }
+        return Result.success(nextChapter.getId());
+    }
+
+    @Override
+    public Result saveComment(BookComment bookComment) {
+        // 校验用户是否已发表评论
+        QueryWrapper<BookComment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", bookComment.getUserId())
+                .eq("book_id", bookComment.getBookId());
+        if (bookCommentMapper.selectCount(queryWrapper) > 0) {
+            // 用户已发表评论
+            return Result.fail("您已发表过评论");
+        }
+        bookComment.setCreateTime(LocalDateTime.now());
+        bookComment.setUpdateTime(LocalDateTime.now());
+        bookCommentMapper.insert(bookComment);
+        return Result.success();
+    }
+
+    @Override
+    public Result getBookshelfContent(Long userId) {
+        QueryWrapper<UserBookshelf> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        List<UserBookshelf> userBookshelves = userBookshelfMapper.selectList(queryWrapper);
+        // 查询书架小说信息
+        List<Long> bookIds = userBookshelves.stream().map(UserBookshelf::getBookId).toList();
+        List<BookInfo> bookInfos = new ArrayList<>();
+        if(bookIds.size() > 0){
+            QueryWrapper<BookInfo> bookInfoQueryWrapper = new QueryWrapper<>();
+            bookInfoQueryWrapper.in("id", bookIds);
+            bookInfos = bookInfoMapper.selectList(bookInfoQueryWrapper);
+        }
+        return Result.success(bookInfos);
+    }
+
+    @Override
+    public Result addBookToBookshelf(Long userId, Long bookId) {
+        // 校验用户是否已将小说加入书架
+        QueryWrapper<UserBookshelf> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId)
+                .eq("book_id", bookId);
+        if (userBookshelfMapper.selectCount(queryWrapper) > 0) {
+            // 用户已加入书架
+            return Result.fail("您已加入书架");
+        }
+        UserBookshelf userBookshelf = new UserBookshelf();
+        userBookshelf.setUserId(userId);
+        userBookshelf.setBookId(bookId);
+        userBookshelf.setCreateTime(LocalDateTime.now());
+        userBookshelf.setUpdateTime(LocalDateTime.now());
+        userBookshelfMapper.insert(userBookshelf);
+        return Result.success();
+    }
+
+    @Override
+    public Result haveBookInBookshelf(Long userId, Long bookId) {
+        QueryWrapper<UserBookshelf> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId)
+                .eq("book_id", bookId);
+        if (userBookshelfMapper.selectCount(queryWrapper) > 0) {
+            return Result.success(true);
+        }
+        return Result.success(false);
+    }
+
+    @Override
+    public Result removeBookFromBookshelf(Long userId, Long bookId) {
+        QueryWrapper<UserBookshelf> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId)
+                .eq("book_id", bookId);
+        userBookshelfMapper.delete(queryWrapper);
+        return Result.success();
     }
 }

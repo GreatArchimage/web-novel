@@ -1,6 +1,7 @@
 package cn.edu.seig.novel.controller.front;
 
 import cn.edu.seig.novel.common.http.Result;
+import cn.edu.seig.novel.dao.entity.BookComment;
 import cn.edu.seig.novel.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,17 +39,7 @@ public class BookController {
     public Result addVisitCount(Long bookId) {
         return bookService.addVisitCount(bookId);
     }
-//
-//    /**
-//     * 小说最新章节相关信息查询接口
-//     */
-//    @Operation(summary = "小说最新章节相关信息查询接口")
-//    @GetMapping("last_chapter/about")
-//    public RestResp<BookChapterAboutRespDto> getLastChapterAbout(
-//        @Parameter(description = "小说ID") Long bookId) {
-//        return bookService.getLastChapterAbout(bookId);
-//    }
-//
+
     /**
      * 小说推荐列表查询接口
      */
@@ -56,46 +47,6 @@ public class BookController {
     public Result listRecBooks(Long bookId){
         return bookService.listRecBooks(bookId);
     }
-//
-//    /**
-//     * 小说章节列表查询接口
-//     */
-//    @Operation(summary = "小说章节列表查询接口")
-//    @GetMapping("chapter/list")
-//    public RestResp<List<BookChapterRespDto>> listChapters(
-//        @Parameter(description = "小说ID") Long bookId) {
-//        return bookService.listChapters(bookId);
-//    }
-//
-//    /**
-//     * 小说内容相关信息查询接口
-//     */
-//    @Operation(summary = "小说内容相关信息查询接口")
-//    @GetMapping("content/{chapterId}")
-//    public RestResp<BookContentAboutRespDto> getBookContentAbout(
-//        @Parameter(description = "章节ID") @PathVariable("chapterId") Long chapterId) {
-//        return bookService.getBookContentAbout(chapterId);
-//    }
-//
-//    /**
-//     * 获取上一章节ID接口
-//     */
-//    @Operation(summary = "获取上一章节ID接口")
-//    @GetMapping("pre_chapter_id/{chapterId}")
-//    public RestResp<Long> getPreChapterId(
-//        @Parameter(description = "章节ID") @PathVariable("chapterId") Long chapterId) {
-//        return bookService.getPreChapterId(chapterId);
-//    }
-//
-//    /**
-//     * 获取下一章节ID接口
-//     */
-//    @Operation(summary = "获取下一章节ID接口")
-//    @GetMapping("next_chapter_id/{chapterId}")
-//    public RestResp<Long> getNextChapterId(
-//        @Parameter(description = "章节ID") @PathVariable("chapterId") Long chapterId) {
-//        return bookService.getNextChapterId(chapterId);
-//    }
 
     /**
      * 小说点击榜查询接口
@@ -138,5 +89,31 @@ public class BookController {
     public Result listNewestComments(Long bookId) {
         return bookService.listNewestComments(bookId);
     }
+
+    @GetMapping("content/{chapterId}")
+    public Result getBookContentAbout(@PathVariable("chapterId") Long chapterId) {
+        return bookService.getBookContentAbout(chapterId);
+    }
+
+    @GetMapping("chapter/list")
+    public Result listChapters(Long bookId) {
+        return bookService.listChapters(bookId);
+    }
+
+    @GetMapping("pre_chapter_id/{chapterId}")
+    public Result getPreChapterId(@PathVariable("chapterId") Long chapterId) {
+        return bookService.getPreChapterId(chapterId);
+    }
+
+    @GetMapping("next_chapter_id/{chapterId}")
+    public Result getNextChapterId(@PathVariable("chapterId") Long chapterId) {
+        return bookService.getNextChapterId(chapterId);
+    }
+
+//    @PostMapping("comment")
+//    public Result saveComment(@RequestBody BookComment bookComment) {
+//        dto.setUserId(UserHolder.getUserId());
+//        return bookService.saveComment(dto);
+//    }
 
 }

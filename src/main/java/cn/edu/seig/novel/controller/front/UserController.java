@@ -1,15 +1,12 @@
 package cn.edu.seig.novel.controller.front;
 
+import cn.edu.seig.novel.auth.UserHolder;
 import cn.edu.seig.novel.common.http.Result;
+import cn.edu.seig.novel.dao.entity.BookComment;
 import cn.edu.seig.novel.dao.entity.UserInfo;
 import cn.edu.seig.novel.dto.UserRegisterReqDto;
 import cn.edu.seig.novel.service.BookService;
 import cn.edu.seig.novel.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +17,7 @@ public class UserController {
 
     private final UserService userService;
 
-//    private final BookService bookService;
+    private final BookService bookService;
 
     /**
      * 用户注册接口
@@ -37,5 +34,32 @@ public class UserController {
     public Result login(@RequestBody UserInfo userInfo) {
         return userService.login(userInfo);
     }
+
+    @PostMapping("comment")
+    public Result saveComment(@RequestBody BookComment bookComment) {
+        bookComment.setUserId(UserHolder.getUserId());
+        return bookService.saveComment(bookComment);
+    }
+
+    @GetMapping("bookshelf")
+    public Result getBookshelfContent() {
+        return bookService.getBookshelfContent(UserHolder.getUserId());
+    }
+
+    @PostMapping("bookshelf/{bookId}")
+    public Result addBookToBookshelf(@PathVariable("bookId") Long bookId) {
+        return bookService.addBookToBookshelf(UserHolder.getUserId(), bookId);
+    }
+
+    @GetMapping("bookshelf/have")
+    public Result haveBookInBookshelf(Long bookId) {
+        return bookService.haveBookInBookshelf(UserHolder.getUserId(), bookId);
+    }
+
+    @DeleteMapping("bookshelf/{bookId}")
+    public Result removeBookFromBookshelf(@PathVariable("bookId") Long bookId) {
+        return bookService.removeBookFromBookshelf(UserHolder.getUserId(), bookId);
+    }
+
 
 }
