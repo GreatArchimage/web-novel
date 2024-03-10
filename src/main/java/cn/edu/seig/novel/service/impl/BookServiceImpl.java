@@ -1,5 +1,6 @@
 package cn.edu.seig.novel.service.impl;
 
+import cn.edu.seig.novel.auth.UserHolder;
 import cn.edu.seig.novel.common.http.Result;
 import cn.edu.seig.novel.common.utils.PageReqParams;
 import cn.edu.seig.novel.common.utils.PageResp;
@@ -108,8 +109,8 @@ public class BookServiceImpl implements BookService {
             return Result.fail("小说名重复");
         }
         //TODO 设置作家信息
-        newBook.setAuthorId(1L);
-
+//        newBook.setAuthorId(1L);
+        newBook.setAuthorId(UserHolder.getAuthorId());
         newBook.setCreateTime(LocalDateTime.now());
         newBook.setUpdateTime(LocalDateTime.now());
 
@@ -407,5 +408,22 @@ public class BookServiceImpl implements BookService {
                 .eq("book_id", bookId);
         userBookshelfMapper.delete(queryWrapper);
         return Result.success();
+    }
+
+    @Override
+    public Result listAuthorBooks(PageReqParams params) {
+        IPage<BookInfo> page = new Page<>();
+        page.setCurrent(params.getPageNum());
+        page.setSize(params.getPageSize());
+        QueryWrapper<BookInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("author_id", UserHolder.getAuthorId());
+        IPage<BookInfo> bookInfoIPage = bookInfoMapper.selectPage(page, queryWrapper);
+        return Result.success(new PageResp<>(
+                bookInfoIPage.getCurrent(),
+                bookInfoIPage.getSize(),
+                bookInfoIPage.getTotal(),
+                bookInfoIPage.getRecords()
+        ));
+
     }
 }

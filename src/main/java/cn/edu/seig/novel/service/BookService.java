@@ -91,4 +91,6 @@ public interface BookService {
     Result haveBookInBookshelf(Long userId, Long bookId);
 
     Result removeBookFromBookshelf(Long userId, Long bookId);
+
+    Result listAuthorBooks(PageReqParams params);
 }

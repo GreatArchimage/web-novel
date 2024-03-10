@@ -18,4 +18,6 @@ public interface UserService {
     Result register(UserRegisterReqDto dto);
 
     Result login(UserInfo userInfo);
+
+    Result updateUserInfo(UserInfo userInfo);
 }

@@ -1,9 +1,12 @@
 package cn.edu.seig.novel.controller.author;
 
+import cn.edu.seig.novel.auth.UserHolder;
 import cn.edu.seig.novel.common.http.Result;
 import cn.edu.seig.novel.common.utils.PageReqParams;
+import cn.edu.seig.novel.dao.entity.AuthorInfo;
 import cn.edu.seig.novel.dao.entity.BookChapter;
 import cn.edu.seig.novel.dao.entity.BookInfo;
+import cn.edu.seig.novel.service.AuthorService;
 import cn.edu.seig.novel.service.BookService;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
@@ -18,6 +21,24 @@ import org.springframework.web.bind.annotation.*;
 public class AuthorController {
 
     private final BookService bookService;
+
+    private final AuthorService authorService;
+
+    @GetMapping("status")
+    public Result getAuthorStatus() {
+        return authorService.getAuthorStatus(UserHolder.getUserId());
+    }
+
+    @PostMapping("register")
+    public Result registerAuthor(@RequestBody AuthorInfo authorInfo) {
+        authorInfo.setUserId(UserHolder.getUserId());
+        return authorService.registerAuthor(authorInfo);
+    }
+
+    @GetMapping("/book/list")
+    public Result listBooks(@ParameterObject PageReqParams pageReqParams) {
+        return bookService.listAuthorBooks(pageReqParams);
+    }
 
     @PostMapping("book")
     public Result publishBook(@RequestBody BookInfo newBook) {

@@ -28,7 +28,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result getUserInfo(Long userId) {
-        return null;
+        UserInfo userInfo = userInfoMapper.selectById(userId);
+        return Result.success(userInfo);
+    }
+
+    @Override
+    public Result updateUserInfo(UserInfo userInfo) {
+        userInfo.setUpdateTime(LocalDateTime.now());
+        userInfoMapper.updateById(userInfo);
+        return Result.success();
     }
 
     @Override
@@ -80,4 +88,6 @@ public class UserServiceImpl implements UserService {
                 .build());
 
     }
+
+
 }

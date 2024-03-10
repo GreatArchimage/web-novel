@@ -61,5 +61,16 @@ public class UserController {
         return bookService.removeBookFromBookshelf(UserHolder.getUserId(), bookId);
     }
 
+    @GetMapping
+    public Result getUserInfo() {
+        return userService.getUserInfo(UserHolder.getUserId());
+    }
+
+    @PutMapping
+    public Result updateUserInfo(@RequestBody UserInfo userInfo) {
+        userInfo.setId(UserHolder.getUserId());
+        return userService.updateUserInfo(userInfo);
+    }
+
 
 }
