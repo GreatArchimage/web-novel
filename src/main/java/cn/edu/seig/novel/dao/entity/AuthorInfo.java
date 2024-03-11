@@ -20,6 +20,7 @@ public class AuthorInfo implements Serializable {
     private String phoneNumber;
 
     private String email;
+    private String signature;
 
     private Integer status;
 
@@ -91,6 +92,14 @@ public class AuthorInfo implements Serializable {
         this.updateTime = updateTime;
     }
 
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
     @Override
     public String toString() {
         return "AuthorInfo{" +
@@ -99,6 +108,7 @@ public class AuthorInfo implements Serializable {
                 ", penName='" + penName + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", email='" + email + '\'' +
+                ", signature='" + signature + '\'' +
                 ", status=" + status +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +

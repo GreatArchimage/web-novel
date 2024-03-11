@@ -35,6 +35,17 @@ public class AuthorController {
         return authorService.registerAuthor(authorInfo);
     }
 
+    @GetMapping("info")
+    public Result getAuthorInfo() {
+        return authorService.getAuthorInfo(UserHolder.getUserId());
+    }
+
+    @PutMapping("info")
+    public Result updateAuthorInfo(@RequestBody AuthorInfo authorInfo) {
+        authorInfo.setUserId(UserHolder.getUserId());
+        return authorService.updateAuthorInfo(authorInfo);
+    }
+
     @GetMapping("/book/list")
     public Result listBooks(@ParameterObject PageReqParams pageReqParams) {
         return bookService.listAuthorBooks(pageReqParams);

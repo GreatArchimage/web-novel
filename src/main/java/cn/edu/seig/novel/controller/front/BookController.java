@@ -20,7 +20,6 @@ public class BookController {
 
     @GetMapping("category/list")
     public Result listCategory(Integer workDirection) {
-        System.out.println(workDirection);
         return bookService.listCategory(workDirection);
     }
 

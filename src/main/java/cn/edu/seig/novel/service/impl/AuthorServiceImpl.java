@@ -39,4 +39,20 @@ public class AuthorServiceImpl implements AuthorService {
         authorInfoMapper.insert(authorInfo);
         return Result.success();
     }
+
+    @Override
+    public Result getAuthorInfo(Long userId) {
+        QueryWrapper<AuthorInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId).last("LIMIT 1");
+        AuthorInfo authorInfo = authorInfoMapper.selectOne(queryWrapper);
+        return Objects.isNull(authorInfo) ? Result.success(null) : Result.success(authorInfo);
+    }
+
+    @Override
+    public Result updateAuthorInfo(AuthorInfo authorInfo) {
+        authorInfo.setUpdateTime(LocalDateTime.now());
+        // 根据userId更新作家信息
+        authorInfoMapper.update(authorInfo, new QueryWrapper<AuthorInfo>().eq("user_id", authorInfo.getUserId()));
+        return Result.success();
+    }
 }

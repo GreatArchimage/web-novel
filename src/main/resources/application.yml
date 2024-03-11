@@ -20,7 +20,7 @@ spring:
       static-locations: file:D:/temp/novel/upload/
 
 server:
-  port: 8888
+  port: 9888
 
 mybatis-plus:
   configuration:

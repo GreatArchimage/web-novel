@@ -9,4 +9,8 @@ public interface AuthorService {
     Result getAuthorStatus(Long userId);
 
     Result registerAuthor(AuthorInfo authorInfo);
+
+    Result getAuthorInfo(Long userId);
+
+    Result updateAuthorInfo(AuthorInfo authorInfo);
 }

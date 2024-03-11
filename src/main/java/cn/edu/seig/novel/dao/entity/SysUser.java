@@ -16,7 +16,7 @@ public class SysUser implements Serializable {
 
     private String password;
 
-    private String name;
+//    private String name;
 
     private Integer gender;
 
@@ -54,13 +54,13 @@ public class SysUser implements Serializable {
         this.password = password;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+//    public String getName() {
+//        return name;
+//    }
+//
+//    public void setName(String name) {
+//        this.name = name;
+//    }
 
     public Integer getGender() {
         return gender;
@@ -116,7 +116,6 @@ public class SysUser implements Serializable {
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
-                ", name='" + name + '\'' +
                 ", gender=" + gender +
                 ", email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +

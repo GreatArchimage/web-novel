@@ -16,9 +16,6 @@ import java.util.Map;
 
 /**
  * 认证授权 拦截器：为了注入其它的 Spring beans，需要通过 @Component 注解将该拦截器注册到 Spring 上下文
- *
- * @author xiongxiaoyang
- * @date 2022/5/18
  */
 @Component
 @RequiredArgsConstructor
@@ -48,7 +45,16 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         // 开始认证
         try {
-            authStrategy.get(authStrategyName).auth(token, requestUri);
+//            authStrategy.get(authStrategyName).auth(token, requestUri);
+            boolean success = authStrategy.get(authStrategyName).auth(token, requestUri);
+            if (!success) {
+                // 认证失败
+                response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                // 返回401状态码
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return false;
+            }
             return HandlerInterceptor.super.preHandle(request, response, handler);
         } catch (Exception exception) {
             // 认证失败
