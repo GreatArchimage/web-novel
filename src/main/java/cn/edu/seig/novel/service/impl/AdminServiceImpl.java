@@ -4,14 +4,8 @@ import cn.edu.seig.novel.common.http.Result;
 import cn.edu.seig.novel.common.utils.JwtUtils;
 import cn.edu.seig.novel.common.utils.PageReqParams;
 import cn.edu.seig.novel.common.utils.PageResp;
-import cn.edu.seig.novel.dao.entity.BookComment;
-import cn.edu.seig.novel.dao.entity.BookInfo;
-import cn.edu.seig.novel.dao.entity.SysUser;
-import cn.edu.seig.novel.dao.entity.UserInfo;
-import cn.edu.seig.novel.dao.mapper.BookCommentMapper;
-import cn.edu.seig.novel.dao.mapper.BookInfoMapper;
-import cn.edu.seig.novel.dao.mapper.SysUserMapper;
-import cn.edu.seig.novel.dao.mapper.UserInfoMapper;
+import cn.edu.seig.novel.dao.entity.*;
+import cn.edu.seig.novel.dao.mapper.*;
 import cn.edu.seig.novel.dto.resp.CommentListItemRespDto;
 import cn.edu.seig.novel.dto.resp.SysUserRespDto;
 import cn.edu.seig.novel.service.AdminService;
@@ -21,6 +15,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -34,6 +29,8 @@ public class AdminServiceImpl implements AdminService {
 
     private final UserInfoMapper userInfoMapper;
     private final BookInfoMapper bookInfoMapper;
+
+    private final BookRecommendMapper bookRecommendMapper;
 
     @Override
     public Result login(SysUser sysUser) {
@@ -86,6 +83,46 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public Result deleteComment(Long id) {
         int i = bookCommentMapper.deleteById(id);
+        if (i == 0) {
+            return Result.fail("删除失败");
+        }
+        return Result.success("删除成功");
+    }
+
+    @Override
+    public Result addBookRecommend(Long bookId, Integer recommendType) {
+        BookRecommend bookRecommend = bookRecommendMapper.selectOne(new QueryWrapper<BookRecommend>()
+                .eq("book_id", bookId)
+                .eq("type", recommendType));
+        if (bookRecommend != null) {
+            return Result.fail("已存在");
+        }
+        BookRecommend newBookRecommend = new BookRecommend();
+        newBookRecommend.setBookId(bookId);
+        newBookRecommend.setType(recommendType);
+        newBookRecommend.setCreateTime(LocalDateTime.now());
+        newBookRecommend.setUpdateTime(LocalDateTime.now());
+        int i = bookRecommendMapper.insert(newBookRecommend);
+        if (i == 0) {
+            return Result.fail("添加失败");
+        }
+        return Result.success("添加成功");
+    }
+
+//    @Override
+//    public Result listBookRecommend() {
+//        // 多表查询book_recommend和book_info
+//        QueryWrapper<BookRecommend> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.orderByDesc("create_time");
+//        List<BookRecommend> bookRecommends = bookRecommendMapper.selectList(queryWrapper);
+//        List<Long> bookIds = bookRecommends.stream().map(BookRecommend::getBookId).toList();
+//        List<BookInfo> bookInfos = bookInfoMapper.selectBatchIds(bookIds);
+//
+//    }
+
+    @Override
+    public Result deleteBookRecommend(Long id) {
+        int i = bookRecommendMapper.deleteById(id);
         if (i == 0) {
             return Result.fail("删除失败");
         }

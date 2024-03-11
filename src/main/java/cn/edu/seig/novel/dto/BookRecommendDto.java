@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class BookRecommendDto {
+    private Long id;
 
     /**
      * 类型;1-顶部栏 2-本周强推 3-热门推荐 4-精品推荐

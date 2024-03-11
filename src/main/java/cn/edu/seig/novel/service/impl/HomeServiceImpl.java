@@ -53,6 +53,7 @@ public class HomeServiceImpl implements HomeService {
         List<BookRecommendDto> bookRecommendDtos = bookRecommends.stream().map(v -> {
             BookInfo bookInfo = bookInfoMap.get(v.getBookId());
             BookRecommendDto bookRecommendDto = new BookRecommendDto();
+            bookRecommendDto.setId(v.getId());
             bookRecommendDto.setType(v.getType());
             bookRecommendDto.setBookId(v.getBookId());
             bookRecommendDto.setBookName(bookInfo.getBookName());

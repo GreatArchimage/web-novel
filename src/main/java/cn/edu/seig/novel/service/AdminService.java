@@ -11,4 +11,10 @@ public interface AdminService {
     Result listComments(PageReqParams pageReqParams);
 
     Result deleteComment(Long id);
+
+    Result addBookRecommend(Long bookId, Integer recommendType);
+
+//    Result listBookRecommend();
+
+    Result deleteBookRecommend(Long id);
 }

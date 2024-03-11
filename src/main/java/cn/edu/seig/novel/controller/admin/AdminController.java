@@ -5,6 +5,7 @@ import cn.edu.seig.novel.common.utils.PageReqParams;
 import cn.edu.seig.novel.dao.entity.SysUser;
 import cn.edu.seig.novel.service.AdminService;
 import cn.edu.seig.novel.service.BookService;
+import cn.edu.seig.novel.service.HomeService;
 import cn.edu.seig.novel.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ public class AdminController {
 
     private final BookService bookService;
     private final UserService userService;
+    private final HomeService homeService;
 
     @PostMapping("/login")
     public Result login(@RequestBody SysUser sysUser) {
@@ -51,5 +53,24 @@ public class AdminController {
     @DeleteMapping("/comment/{id}")
     public Result deleteComment(@PathVariable Long id) {
         return adminService.deleteComment(id);
+    }
+
+    /*
+    添加小说推荐
+     */
+    @PostMapping("/book/recommend")
+    public Result addBookRecommend(Long bookId, Integer recommendType) {
+        return adminService.addBookRecommend(bookId,recommendType);
+    }
+
+    @GetMapping("/book/recommend/list")
+    public Result listBookRecommend() {
+//        return adminService.listBookRecommend();
+        return homeService.listHomeBooks();
+    }
+
+    @DeleteMapping("/book/recommend/{id}")
+    public Result deleteBookRecommend(@PathVariable Long id) {
+        return adminService.deleteBookRecommend(id);
     }
 }
