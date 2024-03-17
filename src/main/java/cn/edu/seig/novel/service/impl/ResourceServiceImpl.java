@@ -1,5 +1,6 @@
 package cn.edu.seig.novel.service.impl;
 
+import cn.edu.seig.novel.cache.VerifyCodeCacheManager;
 import cn.edu.seig.novel.common.http.Result;
 import cn.edu.seig.novel.common.utils.ImgVerifyCodeUtils;
 import cn.edu.seig.novel.dto.resp.ImgVerifyCodeRespDto;
@@ -22,17 +23,19 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ResourceServiceImpl implements ResourceService {
 
+
+    private final VerifyCodeCacheManager verifyCodeManager;
+
     @Value("${novel.file.upload.path}")
     private String fileUploadPath;
     @Override
     public Result getImgVerifyCode() throws IOException {
         String sessionId = IdWorker.get32UUID();
-        String verifyCode = ImgVerifyCodeUtils.getRandomVerifyCode(4);
-        String img = ImgVerifyCodeUtils.genVerifyCodeImg(verifyCode);
-        //TODO 将验证码存入redis中
+//        String verifyCode = ImgVerifyCodeUtils.getRandomVerifyCode(4);
+//        String img = ImgVerifyCodeUtils.genVerifyCodeImg(verifyCode);
         return Result.success(ImgVerifyCodeRespDto.builder()
                 .sessionId(sessionId)
-                .img(img)
+                .img(verifyCodeManager.genImgVerifyCode(sessionId))
                 .build());
     }
 

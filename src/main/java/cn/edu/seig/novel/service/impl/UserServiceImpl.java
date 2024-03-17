@@ -1,5 +1,6 @@
 package cn.edu.seig.novel.service.impl;
 
+import cn.edu.seig.novel.cache.VerifyCodeCacheManager;
 import cn.edu.seig.novel.common.http.Result;
 import cn.edu.seig.novel.common.utils.JwtUtils;
 import cn.edu.seig.novel.dao.entity.UserInfo;
@@ -9,6 +10,7 @@ import cn.edu.seig.novel.dto.resp.UserRespDto;
 import cn.edu.seig.novel.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,6 +21,10 @@ public class UserServiceImpl implements UserService {
     private final UserInfoMapper userInfoMapper;
 
     private final JwtUtils jwtUtils;
+
+    private final VerifyCodeCacheManager verifyCodeCacheManager;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Result listUsers() {
@@ -41,7 +47,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result register(UserRegisterReqDto dto) {
-        //TODO 从redis检验图形验证码是否正确
+        // TODO 从redis检验图形验证码是否正确
+        if(!verifyCodeCacheManager.imgVerifyCodeOk(dto.getSessionId(), dto.getVelCode())){
+            return Result.fail("验证码错误");
+        }
 
         //校验用户名是否已存在
         QueryWrapper<UserInfo> queryWrapper = new QueryWrapper<>();
@@ -54,13 +63,14 @@ public class UserServiceImpl implements UserService {
         // 保存用户信息
         UserInfo userInfo = new UserInfo();
         userInfo.setUsername(dto.getUsername());
-        userInfo.setPassword(dto.getPassword());
+        userInfo.setPassword(passwordEncoder.encode(dto.getPassword()));
         userInfo.setNickName(dto.getUsername());
         userInfo.setCreateTime(LocalDateTime.now());
         userInfo.setUpdateTime(LocalDateTime.now());
         userInfoMapper.insert(userInfo);
 
         //TODO 删除验证码
+        verifyCodeCacheManager.removeImgVerifyCode(dto.getSessionId());
 
         //生成JWT返回
         return Result.success(UserRespDto.builder()
@@ -78,7 +88,10 @@ public class UserServiceImpl implements UserService {
         if(user == null){
             return Result.fail("用户不存在");
         }
-        if(!user.getPassword().equals(userInfo.getPassword())){
+//        if(!user.getPassword().equals(userInfo.getPassword())){
+//            return Result.fail("密码错误");
+//        }
+        if(!passwordEncoder.matches(userInfo.getPassword(), user.getPassword())){
             return Result.fail("密码错误");
         }
         return Result.success(UserRespDto.builder()
