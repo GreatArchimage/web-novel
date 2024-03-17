@@ -1,6 +1,8 @@
 package cn.edu.seig.novel.service.impl;
 
 import cn.edu.seig.novel.auth.UserHolder;
+import cn.edu.seig.novel.cache.BookChapterCacheManager;
+import cn.edu.seig.novel.cache.BookInfoCacheManager;
 import cn.edu.seig.novel.common.http.Result;
 import cn.edu.seig.novel.common.utils.PageReqParams;
 import cn.edu.seig.novel.common.utils.PageResp;
@@ -43,32 +45,38 @@ public class BookServiceImpl implements BookService {
 
     private final UserBookshelfMapper userBookshelfMapper;
 
+    private final BookInfoCacheManager bookInfoCacheManager;
+
+    private final BookChapterCacheManager bookChapterCacheManager;
     @Override
     public Result listVisitRankBooks() {
-        QueryWrapper<BookInfo> bookInfoQueryWrapper = new QueryWrapper<>();
-        bookInfoQueryWrapper.orderByDesc("visit_count")
-                .last("limit 30");
-        return Result.success(bookInfoMapper.selectList(bookInfoQueryWrapper));
-
+//        QueryWrapper<BookInfo> bookInfoQueryWrapper = new QueryWrapper<>();
+//        bookInfoQueryWrapper.orderByDesc("visit_count")
+//                .last("limit 30");
+//        return Result.success(bookInfoMapper.selectList(bookInfoQueryWrapper));
+        return Result.success(bookInfoCacheManager.listVisitRankBooks());
     }
 
     @Override
     public Result listNewestRankBooks() {
-        QueryWrapper<BookInfo> bookInfoQueryWrapper = new QueryWrapper<>();
-        bookInfoQueryWrapper.orderByDesc("create_time").last("limit 30");
-        return Result.success(bookInfoMapper.selectList(bookInfoQueryWrapper));
+//        QueryWrapper<BookInfo> bookInfoQueryWrapper = new QueryWrapper<>();
+//        bookInfoQueryWrapper.orderByDesc("create_time").last("limit 30");
+//        return Result.success(bookInfoMapper.selectList(bookInfoQueryWrapper));
+        return Result.success(bookInfoCacheManager.listNewestRankBooks());
     }
 
     @Override
     public Result listUpdateRankBooks() {
-        QueryWrapper<BookInfo> bookInfoQueryWrapper = new QueryWrapper<>();
-        bookInfoQueryWrapper.orderByDesc("update_time").last("limit 30");
-        return Result.success(bookInfoMapper.selectList(bookInfoQueryWrapper));
+//        QueryWrapper<BookInfo> bookInfoQueryWrapper = new QueryWrapper<>();
+//        bookInfoQueryWrapper.orderByDesc("update_time").last("limit 30");
+//        return Result.success(bookInfoMapper.selectList(bookInfoQueryWrapper));
+        return Result.success(bookInfoCacheManager.listUpdateRankBooks());
     }
 
     @Override
     public Result getBookById(Long bookId) {
-        BookInfo bookInfo = bookInfoMapper.selectById(bookId);
+//        BookInfo bookInfo = bookInfoMapper.selectById(bookId);
+        BookInfo bookInfo = bookInfoCacheManager.getBookInfo(bookId);
         QueryWrapper<BookChapter> queryWrapper = new QueryWrapper<>();
         queryWrapper
                 .eq("book_id", bookId)
@@ -95,11 +103,14 @@ public class BookServiceImpl implements BookService {
         return Result.success(bookInfoRespDto);
     }
 
+   // Admin Start
     @Override
     public Result listBooks() {
         return Result.success(bookInfoMapper.selectList(null));
     }
+    // Admin End
 
+    // Author Start
     @Override
     public Result saveBook(BookInfo newBook) {
         // 检查小说名是否重复
@@ -108,8 +119,6 @@ public class BookServiceImpl implements BookService {
         if (bookInfoMapper.selectCount(bookInfoQueryWrapper) > 0) {
             return Result.fail("小说名重复");
         }
-        //TODO 设置作家信息
-//        newBook.setAuthorId(1L);
         newBook.setAuthorId(UserHolder.getAuthorId());
         newBook.setCreateTime(LocalDateTime.now());
         newBook.setUpdateTime(LocalDateTime.now());
@@ -192,6 +201,25 @@ public class BookServiceImpl implements BookService {
         bookInfoMapper.updateById(bookInfo);
         return Result.success();
     }
+
+    @Override
+    public Result listAuthorBooks(PageReqParams params) {
+        IPage<BookInfo> page = new Page<>();
+        page.setCurrent(params.getPageNum());
+        page.setSize(params.getPageSize());
+        QueryWrapper<BookInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("author_id", UserHolder.getAuthorId());
+        IPage<BookInfo> bookInfoIPage = bookInfoMapper.selectPage(page, queryWrapper);
+        return Result.success(new PageResp<>(
+                bookInfoIPage.getCurrent(),
+                bookInfoIPage.getSize(),
+                bookInfoIPage.getTotal(),
+                bookInfoIPage.getRecords()
+        ));
+
+    }
+
+    //Author End
 
     @Override
     public Result listCategory(Integer workDirection) {
@@ -288,8 +316,10 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Result getBookContentAbout(Long chapterId) {
-        BookChapter bookChapter = bookChapterMapper.selectById(chapterId);
-        BookInfo bookInfo = bookInfoMapper.selectById(bookChapter.getBookId());
+//        BookChapter bookChapter = bookChapterMapper.selectById(chapterId);
+//        BookInfo bookInfo = bookInfoMapper.selectById(bookChapter.getBookId());
+        BookChapter bookChapter = bookChapterCacheManager.getBookChapter(chapterId);
+        BookInfo bookInfo = bookInfoCacheManager.getBookInfo(bookChapter.getBookId());
         return Result.success(BookContentAboutRespDto.builder()
                 .bookInfo(bookInfo)
                 .bookContent(bookChapter.getChapterContent())
@@ -298,10 +328,11 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Result listChapters(Long bookId) {
-        QueryWrapper<BookChapter> bookChapterQueryWrapper = new QueryWrapper<>();
-        bookChapterQueryWrapper.eq("book_id", bookId)
-                .orderByAsc("chapter_num");
-        List<BookChapter> bookChapters = bookChapterMapper.selectList(bookChapterQueryWrapper);
+//        QueryWrapper<BookChapter> bookChapterQueryWrapper = new QueryWrapper<>();
+//        bookChapterQueryWrapper.eq("book_id", bookId)
+//                .orderByAsc("chapter_num");
+//        List<BookChapter> bookChapters = bookChapterMapper.selectList(bookChapterQueryWrapper);
+        List<BookChapter> bookChapters = bookChapterCacheManager.listChapters(bookId);
         return Result.success(bookChapters);
     }
 
@@ -357,18 +388,19 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Result getBookshelfContent(Long userId) {
-        QueryWrapper<UserBookshelf> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", userId);
-        List<UserBookshelf> userBookshelves = userBookshelfMapper.selectList(queryWrapper);
-        // 查询书架小说信息
-        List<Long> bookIds = userBookshelves.stream().map(UserBookshelf::getBookId).toList();
-        List<BookInfo> bookInfos = new ArrayList<>();
-        if(bookIds.size() > 0){
-            QueryWrapper<BookInfo> bookInfoQueryWrapper = new QueryWrapper<>();
-            bookInfoQueryWrapper.in("id", bookIds);
-            bookInfos = bookInfoMapper.selectList(bookInfoQueryWrapper);
-        }
-        return Result.success(bookInfos);
+//        QueryWrapper<UserBookshelf> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.eq("user_id", userId);
+//        List<UserBookshelf> userBookshelves = userBookshelfMapper.selectList(queryWrapper);
+//        // 查询书架小说信息
+//        List<Long> bookIds = userBookshelves.stream().map(UserBookshelf::getBookId).toList();
+//        List<BookInfo> bookInfos = new ArrayList<>();
+//        if(bookIds.size() > 0){
+//            QueryWrapper<BookInfo> bookInfoQueryWrapper = new QueryWrapper<>();
+//            bookInfoQueryWrapper.in("id", bookIds);
+//            bookInfos = bookInfoMapper.selectList(bookInfoQueryWrapper);
+//        }
+//        return Result.success(bookInfos);
+        return Result.success(bookInfoCacheManager.getBooksFromBookShelf(userId));
     }
 
     @Override
@@ -387,6 +419,8 @@ public class BookServiceImpl implements BookService {
         userBookshelf.setCreateTime(LocalDateTime.now());
         userBookshelf.setUpdateTime(LocalDateTime.now());
         userBookshelfMapper.insert(userBookshelf);
+        // 清除书架缓存
+        bookInfoCacheManager.evictBookShelfCache(userId);
         return Result.success();
     }
 
@@ -407,23 +441,9 @@ public class BookServiceImpl implements BookService {
         queryWrapper.eq("user_id", userId)
                 .eq("book_id", bookId);
         userBookshelfMapper.delete(queryWrapper);
+        // 清除书架缓存
+        bookInfoCacheManager.evictBookShelfCache(userId);
         return Result.success();
     }
 
-    @Override
-    public Result listAuthorBooks(PageReqParams params) {
-        IPage<BookInfo> page = new Page<>();
-        page.setCurrent(params.getPageNum());
-        page.setSize(params.getPageSize());
-        QueryWrapper<BookInfo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("author_id", UserHolder.getAuthorId());
-        IPage<BookInfo> bookInfoIPage = bookInfoMapper.selectPage(page, queryWrapper);
-        return Result.success(new PageResp<>(
-                bookInfoIPage.getCurrent(),
-                bookInfoIPage.getSize(),
-                bookInfoIPage.getTotal(),
-                bookInfoIPage.getRecords()
-        ));
-
-    }
 }

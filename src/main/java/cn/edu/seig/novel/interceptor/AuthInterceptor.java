@@ -2,6 +2,7 @@ package cn.edu.seig.novel.interceptor;
 
 import cn.edu.seig.novel.auth.AuthStrategy;
 import cn.edu.seig.novel.auth.UserHolder;
+import cn.edu.seig.novel.common.http.Result;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -52,7 +53,8 @@ public class AuthInterceptor implements HandlerInterceptor {
                 response.setCharacterEncoding(StandardCharsets.UTF_8.name());
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 // 返回401状态码
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write(objectMapper.writeValueAsString(Result.fail(401, "认证失败")));
                 return false;
             }
             return HandlerInterceptor.super.preHandle(request, response, handler);

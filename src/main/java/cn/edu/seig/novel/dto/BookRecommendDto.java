@@ -2,8 +2,10 @@ package cn.edu.seig.novel.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class BookRecommendDto {
+public class BookRecommendDto implements Serializable {
     private Long id;
 
     /**

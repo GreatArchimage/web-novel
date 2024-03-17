@@ -2,12 +2,6 @@ package cn.edu.seig.novel.auth;
 
 import lombok.experimental.UtilityClass;
 
-/**
- * 用户信息 持有类
- *
- * @author xiongxiaoyang
- * @date 2022/5/18
- */
 @UtilityClass
 public class UserHolder {
 

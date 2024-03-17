@@ -25,8 +25,6 @@ public class SearchServiceImpl implements SearchService {
         page.setCurrent(condition.getPageNum());
         page.setSize(condition.getPageSize());
         List<BookInfo> bookInfos = bookInfoMapper.searchBooks(page, condition);
-
-
         return Result.success(new PageResp<>(condition.getPageNum(),condition.getPageSize(),page.getTotal(),bookInfos));
     }
 }

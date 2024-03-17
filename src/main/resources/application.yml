@@ -33,7 +33,7 @@ novel:
     # 允许跨域的域名
     allow-origins:
       - http://localhost:1024
-      - http://localhost:1027
+      - http://localhost:13780
       - http://localhost:3000
       - http://localhost:3001
   jwt:
