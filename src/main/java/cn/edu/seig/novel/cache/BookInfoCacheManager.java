@@ -8,6 +8,7 @@ import cn.edu.seig.novel.dao.mapper.BookChapterMapper;
 import cn.edu.seig.novel.dao.mapper.BookInfoMapper;
 import cn.edu.seig.novel.dao.mapper.UserBookshelfMapper;
 import cn.edu.seig.novel.dto.resp.BookInfoRespDto;
+import cn.edu.seig.novel.dto.resp.BookshelfContentRespDto;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -15,8 +16,12 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
+import java.awt.print.Book;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -56,7 +61,7 @@ public class BookInfoCacheManager {
     }
 
     @Cacheable(value = "bookShelf")
-    public List<BookInfo> getBooksFromBookShelf(Long userId) {
+    public List<BookshelfContentRespDto> getBooksFromBookShelf(Long userId) {
         QueryWrapper<UserBookshelf> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId);
         List<UserBookshelf> userBookshelves = userBookshelfMapper.selectList(queryWrapper);
@@ -68,7 +73,30 @@ public class BookInfoCacheManager {
             bookInfoQueryWrapper.in("id", bookIds);
             bookInfos = bookInfoMapper.selectList(bookInfoQueryWrapper);
         }
-        return bookInfos;
+        Map<Long, BookInfo> bookInfoMap = bookInfos.stream().collect(Collectors.toMap(BookInfo::getId, Function.identity()));
+        List<Long> chapterIds = userBookshelves.stream().map(UserBookshelf::getPreChapterId).toList();
+        List<BookChapter> bookChapters = new ArrayList<>();
+        if(chapterIds.size() > 0){
+            QueryWrapper<BookChapter> bookChapterQueryWrapper = new QueryWrapper<>();
+            bookChapterQueryWrapper.in("id", chapterIds);
+            bookChapters = bookChapterMapper.selectList(bookChapterQueryWrapper);
+        }
+        Map<Long, BookChapter> bookChapterMap = bookChapters.stream().collect(Collectors.toMap(BookChapter::getId, Function.identity()));
+        List<BookshelfContentRespDto> bookshelfContentRespDtos = userBookshelves.stream().map(v -> {
+            BookshelfContentRespDto bookshelfContentRespDto = new BookshelfContentRespDto();
+            bookshelfContentRespDto.setId(v.getId());
+            bookshelfContentRespDto.setBookId(v.getBookId());
+            bookshelfContentRespDto.setPicUrl(bookInfoMap.get(v.getBookId()).getPicUrl());
+            bookshelfContentRespDto.setBookName(bookInfoMap.get(v.getBookId()).getBookName());
+            bookshelfContentRespDto.setAuthorId(bookInfoMap.get(v.getBookId()).getAuthorId());
+            bookshelfContentRespDto.setAuthorName(bookInfoMap.get(v.getBookId()).getAuthorName());
+            bookshelfContentRespDto.setPreChapterId(v.getPreChapterId());
+            bookshelfContentRespDto.setPreChapterName(bookChapterMap.get(v.getPreChapterId()).getChapterName());
+            bookshelfContentRespDto.setUpdateTime(v.getUpdateTime());
+            return bookshelfContentRespDto;
+        }).collect(Collectors.toList());
+        return bookshelfContentRespDtos;
+
     }
 
     @CacheEvict(value = "bookShelf", key = "#userId")
