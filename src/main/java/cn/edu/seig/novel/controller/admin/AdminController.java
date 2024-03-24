@@ -2,6 +2,7 @@ package cn.edu.seig.novel.controller.admin;
 
 import cn.edu.seig.novel.common.http.Result;
 import cn.edu.seig.novel.common.utils.PageReqParams;
+import cn.edu.seig.novel.dao.entity.BookCategory;
 import cn.edu.seig.novel.dao.entity.SysUser;
 import cn.edu.seig.novel.service.AdminService;
 import cn.edu.seig.novel.service.BookService;
@@ -72,5 +73,20 @@ public class AdminController {
     @DeleteMapping("/book/recommend/{id}")
     public Result deleteBookRecommend(@PathVariable Long id) {
         return adminService.deleteBookRecommend(id);
+    }
+
+    @GetMapping("category/list")
+    public Result listCategory() {
+        return bookService.listCategory();
+    }
+
+    @PostMapping("category")
+    public Result saveCategory(@RequestBody BookCategory bookCategory) {
+        return adminService.saveCategory(bookCategory);
+    }
+
+    @DeleteMapping("category/{id}")
+    public Result deleteCategory(@PathVariable Long id) {
+        return adminService.deleteCategory(id);
     }
 }

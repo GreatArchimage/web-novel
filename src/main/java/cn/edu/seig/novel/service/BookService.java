@@ -49,7 +49,7 @@ public interface BookService {
 
     Result updateBookChapter(Long chapterId, BookChapter chapter);
 
-    Result listCategory(Integer workDirection);
+    Result listCategory();
 
 //
 //    /**

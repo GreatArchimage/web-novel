@@ -84,22 +84,23 @@ public class BookServiceImpl implements BookService {
                 .last("limit 1");
         BookChapter firstBookChapter = bookChapterMapper.selectOne(queryWrapper);
         // 组装响应对象
-        BookInfoRespDto bookInfoRespDto = BookInfoRespDto.builder()
-                .id(bookInfo.getId())
-                .bookName(bookInfo.getBookName())
-                .intro(bookInfo.getIntro())
-                .bookStatus(bookInfo.getBookStatus())
-                .authorId(bookInfo.getAuthorId())
-                .authorName(bookInfo.getAuthorName())
-                .categoryId(bookInfo.getCategoryId())
-                .categoryName(bookInfo.getCategoryName())
-                .commentCount(bookInfo.getCommentCount())
-                .firstChapterId(firstBookChapter.getId())
-                .lastChapterId(bookInfo.getLastChapterId())
-                .picUrl(bookInfo.getPicUrl())
-                .visitCount(bookInfo.getVisitCount())
-                .wordCount(bookInfo.getWordCount())
-                .build();
+        BookInfoRespDto bookInfoRespDto = new BookInfoRespDto();
+        bookInfoRespDto.setId(bookInfo.getId());
+        bookInfoRespDto.setBookName(bookInfo.getBookName());
+        bookInfoRespDto.setIntro(bookInfo.getIntro());
+        bookInfoRespDto.setBookStatus(bookInfo.getBookStatus());
+        bookInfoRespDto.setAuthorId(bookInfo.getAuthorId());
+        bookInfoRespDto.setAuthorName(bookInfo.getAuthorName());
+        bookInfoRespDto.setCategoryId(bookInfo.getCategoryId());
+        bookInfoRespDto.setCategoryName(bookInfo.getCategoryName());
+        bookInfoRespDto.setCommentCount(bookInfo.getCommentCount());
+        bookInfoRespDto.setLastChapterId(bookInfo.getLastChapterId());
+        bookInfoRespDto.setPicUrl(bookInfo.getPicUrl());
+        bookInfoRespDto.setVisitCount(bookInfo.getVisitCount());
+        bookInfoRespDto.setWordCount(bookInfo.getWordCount());
+        if(firstBookChapter != null){
+            bookInfoRespDto.setFirstChapterId(firstBookChapter.getId());
+        }
         return Result.success(bookInfoRespDto);
     }
 
@@ -222,10 +223,10 @@ public class BookServiceImpl implements BookService {
     //Author End
 
     @Override
-    public Result listCategory(Integer workDirection) {
+    public Result listCategory() {
 
         QueryWrapper<BookCategory> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("work_direction", workDirection);
+//        queryWrapper.eq("work_direction", workDirection);
         return Result.success(bookCategoryMapper.selectList(queryWrapper));
     }
 
@@ -252,6 +253,9 @@ public class BookServiceImpl implements BookService {
                 .orderByDesc("chapter_num")
                 .last("limit 1");
         BookChapter lastChapter = bookChapterMapper.selectOne(bookChapterQueryWrapper);
+        if (lastChapter == null) {
+            return Result.success("暂无章节", null);
+        }
         // 查询章节总数
         bookChapterQueryWrapper.clear();
         bookChapterQueryWrapper.eq("book_id", bookId);

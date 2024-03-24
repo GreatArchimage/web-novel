@@ -19,8 +19,8 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping("category/list")
-    public Result listCategory(Integer workDirection) {
-        return bookService.listCategory(workDirection);
+    public Result listCategory(){
+        return bookService.listCategory();
     }
 
     /**

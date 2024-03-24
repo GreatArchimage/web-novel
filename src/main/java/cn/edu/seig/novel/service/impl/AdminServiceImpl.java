@@ -32,6 +32,8 @@ public class AdminServiceImpl implements AdminService {
 
     private final BookRecommendMapper bookRecommendMapper;
 
+    private final BookCategoryMapper bookCategoryMapper;
+
     @Override
     public Result login(SysUser sysUser) {
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
@@ -123,6 +125,26 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public Result deleteBookRecommend(Long id) {
         int i = bookRecommendMapper.deleteById(id);
+        if (i == 0) {
+            return Result.fail("删除失败");
+        }
+        return Result.success("删除成功");
+    }
+
+    @Override
+    public Result saveCategory(BookCategory bookCategory) {
+        bookCategory.setCreateTime(LocalDateTime.now());
+        bookCategory.setUpdateTime(LocalDateTime.now());
+        int i = bookCategoryMapper.insert(bookCategory);
+        if (i == 0) {
+            return Result.fail("添加失败");
+        }
+        return Result.success("添加成功");
+    }
+
+    @Override
+    public Result deleteCategory(Long id) {
+        int i = bookCategoryMapper.deleteById(id);
         if (i == 0) {
             return Result.fail("删除失败");
         }

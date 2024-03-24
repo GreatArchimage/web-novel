@@ -2,6 +2,7 @@ package cn.edu.seig.novel.service;
 
 import cn.edu.seig.novel.common.http.Result;
 import cn.edu.seig.novel.common.utils.PageReqParams;
+import cn.edu.seig.novel.dao.entity.BookCategory;
 import cn.edu.seig.novel.dao.entity.SysUser;
 
 public interface AdminService {
@@ -17,4 +18,8 @@ public interface AdminService {
 //    Result listBookRecommend();
 
     Result deleteBookRecommend(Long id);
+
+    Result saveCategory(BookCategory bookCategory);
+
+    Result deleteCategory(Long id);
 }
