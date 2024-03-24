@@ -34,6 +34,8 @@ public class AdminServiceImpl implements AdminService {
 
     private final BookCategoryMapper bookCategoryMapper;
 
+    private final SysUserRoleMapper sysUserRoleMapper;
+
     @Override
     public Result login(SysUser sysUser) {
         QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
@@ -62,23 +64,6 @@ public class AdminServiceImpl implements AdminService {
         List<CommentListItemRespDto> commentList = bookCommentMapper.listComments(page, queryWrapper);
         return Result.success(new PageResp<>(
                 page.getCurrent(),page.getSize(), page.getTotal(), commentList));
-
-        // 废弃方案
-//        IPage<BookComment> page = new Page<>();
-//        page.setCurrent(params.getPageNum());
-//        page.setSize(params.getPageSize());
-//        QueryWrapper<BookComment> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.orderByDesc("create_time");
-//        IPage<BookComment> commentIPage = bookCommentMapper.selectPage(page, queryWrapper);
-//        List<BookComment> commentList = commentIPage.getRecords();
-//        // 将所有评论的user_id和book_id取出
-//        List<Long> userIds = commentList.stream().map(BookComment::getUserId).toList();
-//        List<Long> bookIds = commentList.stream().map(BookComment::getBookId).toList();
-//        // 根据查询结果的user_id和book_id查询用户信息和小说信息
-//        List<UserInfo> userInfoList = userInfoMapper.selectBatchIds(userIds);
-//        List<BookInfo> bookInfoList = bookInfoMapper.selectBatchIds(bookIds);
-//        // 将查询结果封装成CommentListItemRespDto
-
 
     }
 
@@ -111,17 +96,6 @@ public class AdminServiceImpl implements AdminService {
         return Result.success("添加成功");
     }
 
-//    @Override
-//    public Result listBookRecommend() {
-//        // 多表查询book_recommend和book_info
-//        QueryWrapper<BookRecommend> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.orderByDesc("create_time");
-//        List<BookRecommend> bookRecommends = bookRecommendMapper.selectList(queryWrapper);
-//        List<Long> bookIds = bookRecommends.stream().map(BookRecommend::getBookId).toList();
-//        List<BookInfo> bookInfos = bookInfoMapper.selectBatchIds(bookIds);
-//
-//    }
-
     @Override
     public Result deleteBookRecommend(Long id) {
         int i = bookRecommendMapper.deleteById(id);
@@ -148,6 +122,49 @@ public class AdminServiceImpl implements AdminService {
         if (i == 0) {
             return Result.fail("删除失败");
         }
+        return Result.success("删除成功");
+    }
+
+    @Override
+    public Result listSysUsers() {
+        List<SysUser> sysUsers = sysUserMapper.selectList(null);
+        return Result.success(sysUsers);
+    }
+
+    @Override
+    public Result addSysUser(SysUser sysUser) {
+        // 检查用户名是否已存在
+        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", sysUser.getUsername());
+        SysUser user = sysUserMapper.selectOne(queryWrapper);
+        if (user != null) {
+            return Result.fail("用户名已存在");
+        }
+        sysUser.setCreateTime(LocalDateTime.now());
+        sysUser.setUpdateTime(LocalDateTime.now());
+        int i = sysUserMapper.insert(sysUser);
+        if (i == 0) {
+            return Result.fail("添加失败");
+        }
+        SysUserRole sysUserRole = new SysUserRole();
+        sysUserRole.setUserId(sysUser.getId());
+        sysUserRole.setRoleId(1L);
+        sysUserRoleMapper.insert(sysUserRole);
+        return Result.success("添加成功");
+    }
+
+    @Override
+    public Result deleteSysUser(Long id) {
+        // 检查是否为超级管理员
+        SysUserRole sysUserRole = sysUserRoleMapper.selectOne(new QueryWrapper<SysUserRole>().eq("user_id", id));
+        if (sysUserRole == null || sysUserRole.getRoleId() == 0) {
+            return Result.fail("无法删除");
+        }
+        int i = sysUserMapper.deleteById(id);
+        if (i == 0) {
+            return Result.fail("删除失败");
+        }
+        sysUserRoleMapper.delete(new QueryWrapper<SysUserRole>().eq("user_id", id));
         return Result.success("删除成功");
     }
 }

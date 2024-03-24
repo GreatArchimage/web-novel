@@ -22,4 +22,10 @@ public interface AdminService {
     Result saveCategory(BookCategory bookCategory);
 
     Result deleteCategory(Long id);
+
+    Result listSysUsers();
+
+    Result addSysUser(SysUser sysUser);
+
+    Result deleteSysUser(Long id);
 }

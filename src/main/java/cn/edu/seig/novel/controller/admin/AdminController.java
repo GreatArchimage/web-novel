@@ -9,6 +9,7 @@ import cn.edu.seig.novel.service.BookService;
 import cn.edu.seig.novel.service.HomeService;
 import cn.edu.seig.novel.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -88,5 +89,25 @@ public class AdminController {
     @DeleteMapping("category/{id}")
     public Result deleteCategory(@PathVariable Long id) {
         return adminService.deleteCategory(id);
+    }
+
+    @GetMapping("book/chapters/{bookId}")
+    public Result listBookChapters(@PathVariable("bookId") Long bookId, @ParameterObject PageReqParams pageReqParams) {
+        return bookService.listBookChapters(bookId, pageReqParams);
+    }
+
+    @GetMapping("/sysUser/list")
+    public Result listSysUsers() {
+        return adminService.listSysUsers();
+    }
+
+    @PostMapping("/sysUser")
+    public Result addSysUser(@RequestBody SysUser sysUser) {
+        return adminService.addSysUser(sysUser);
+    }
+
+    @DeleteMapping("/sysUser/{id}")
+    public Result deleteSysUser(@PathVariable Long id) {
+        return adminService.deleteSysUser(id);
     }
 }
