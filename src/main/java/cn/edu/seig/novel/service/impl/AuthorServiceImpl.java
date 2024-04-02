@@ -34,6 +34,7 @@ public class AuthorServiceImpl implements AuthorService {
             return Result.success();
         }
         // 保存作家注册信息
+        authorInfo.setStatus(0);
         authorInfo.setCreateTime(LocalDateTime.now());
         authorInfo.setUpdateTime(LocalDateTime.now());
         authorInfoMapper.insert(authorInfo);

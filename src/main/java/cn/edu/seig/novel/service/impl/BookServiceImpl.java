@@ -312,6 +312,7 @@ public class BookServiceImpl implements BookService {
                     .commentUser(userInfoMap.get(v.getUserId()).getUsername())
                     .commentUserPhoto(userInfoMap.get(v.getUserId()).getUserPhoto())
                     .commentContent(v.getCommentContent())
+                    .rate(v.getRate())
                     .commentTime(v.getCreateTime())
                     .build()).toList();
         bookCommentRespDto.setComments(commentInfos);
@@ -380,13 +381,19 @@ public class BookServiceImpl implements BookService {
         QueryWrapper<BookComment> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", bookComment.getUserId())
                 .eq("book_id", bookComment.getBookId());
-        if (bookCommentMapper.selectCount(queryWrapper) > 0) {
-            // 用户已发表评论
-            return Result.fail("您已发表过评论");
-        }
+
+//        if (bookCommentMapper.selectCount(queryWrapper) > 0) {
+//            // 用户已发表评论
+//            return Result.fail("您已发表过评论");
+//        }
         bookComment.setCreateTime(LocalDateTime.now());
         bookComment.setUpdateTime(LocalDateTime.now());
         bookCommentMapper.insert(bookComment);
+        // 更新小说评论数和评分
+        BookInfo bookInfo = bookInfoMapper.selectById(bookComment.getBookId());
+        bookInfo.setCommentCount(bookInfo.getCommentCount() + 1);
+        bookInfo.setScore((bookInfo.getScore() * (bookInfo.getCommentCount() - 1) + bookComment.getRate()) / bookInfo.getCommentCount());
+        bookInfoMapper.updateById(bookInfo);
         return Result.success();
     }
 

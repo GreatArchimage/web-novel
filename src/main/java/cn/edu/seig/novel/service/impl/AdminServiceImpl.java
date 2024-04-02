@@ -167,4 +167,25 @@ public class AdminServiceImpl implements AdminService {
         sysUserRoleMapper.delete(new QueryWrapper<SysUserRole>().eq("user_id", id));
         return Result.success("删除成功");
     }
+
+    @Override
+    public Result disableUser(Long id) {
+        UserInfo userInfo = userInfoMapper.selectById(id);
+        if (userInfo == null) {
+            return Result.fail("用户不存在");
+        }
+        userInfo.setStatus(1);
+        userInfo.setUpdateTime(LocalDateTime.now());
+        userInfoMapper.updateById(userInfo);
+        return Result.success("禁用成功");
+    }
+
+    @Override
+    public Result deleteUser(Long id) {
+        int i = userInfoMapper.deleteById(id);
+        if (i == 0) {
+            return Result.fail("删除失败");
+        }
+        return Result.success("删除成功");
+    }
 }

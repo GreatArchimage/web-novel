@@ -42,6 +42,19 @@ public class AdminController {
     }
 
     /*
+    禁用用户
+     */
+    @PutMapping("/user/disable/{id}")
+    public Result disableUser(@PathVariable Long id) {
+        return adminService.disableUser(id);
+    }
+
+    @DeleteMapping("/user/{id}")
+    public Result deleteUser(@PathVariable Long id) {
+        return adminService.deleteUser(id);
+    }
+
+    /*
     查询所有评论
      */
     @GetMapping("/comment/list")

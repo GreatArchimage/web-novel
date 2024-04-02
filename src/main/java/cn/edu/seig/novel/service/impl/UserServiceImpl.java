@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result register(UserRegisterReqDto dto) {
-        // TODO 从redis检验图形验证码是否正确
+        // 从redis检验图形验证码是否正确
         if(!verifyCodeCacheManager.imgVerifyCodeOk(dto.getSessionId(), dto.getVelCode())){
             return Result.fail("验证码错误");
         }
@@ -65,11 +65,12 @@ public class UserServiceImpl implements UserService {
         userInfo.setUsername(dto.getUsername());
         userInfo.setPassword(passwordEncoder.encode(dto.getPassword()));
         userInfo.setNickName(dto.getUsername());
+        userInfo.setStatus(0);
         userInfo.setCreateTime(LocalDateTime.now());
         userInfo.setUpdateTime(LocalDateTime.now());
         userInfoMapper.insert(userInfo);
 
-        //TODO 删除验证码
+        //删除验证码
         verifyCodeCacheManager.removeImgVerifyCode(dto.getSessionId());
 
         //生成JWT返回
@@ -93,6 +94,9 @@ public class UserServiceImpl implements UserService {
 //        }
         if(!passwordEncoder.matches(userInfo.getPassword(), user.getPassword())){
             return Result.fail("密码错误");
+        }
+        if(user.getStatus() == 1){
+            return Result.fail("用户已被禁用");
         }
         return Result.success(UserRespDto.builder()
                 .token(jwtUtils.generateToken(user.getId(), "front"))

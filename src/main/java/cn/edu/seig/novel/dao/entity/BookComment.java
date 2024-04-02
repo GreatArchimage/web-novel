@@ -19,6 +19,8 @@ public class BookComment implements Serializable {
     private Long userId;
 
     private String commentContent;
+
+    private Integer rate;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -72,6 +74,14 @@ public class BookComment implements Serializable {
         this.updateTime = updateTime;
     }
 
+    public Integer getRate() {
+        return rate;
+    }
+
+    public void setRate(Integer rate) {
+        this.rate = rate;
+    }
+
     @Override
     public String toString() {
         return "BookComment{" +
@@ -79,6 +89,7 @@ public class BookComment implements Serializable {
                 ", bookId=" + bookId +
                 ", userId=" + userId +
                 ", commentContent='" + commentContent + '\'' +
+                ", rate=" + rate +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
                 '}';

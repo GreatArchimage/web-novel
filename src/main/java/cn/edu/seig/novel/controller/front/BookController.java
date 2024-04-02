@@ -34,8 +34,12 @@ public class BookController {
     /**
      * 增加小说点击量接口
      */
-    @PostMapping("visit")
-    public Result addVisitCount(Long bookId) {
+//    @PostMapping("visit")
+//    public Result addVisitCount(Long bookId) {
+//        return bookService.addVisitCount(bookId);
+//    }
+    @PutMapping("visit/{bookId}")
+    public Result addVisitCount(@PathVariable("bookId") Long bookId) {
         return bookService.addVisitCount(bookId);
     }
 

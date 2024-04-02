@@ -28,4 +28,8 @@ public interface AdminService {
     Result addSysUser(SysUser sysUser);
 
     Result deleteSysUser(Long id);
+
+    Result disableUser(Long id);
+
+    Result deleteUser(Long id);
 }
