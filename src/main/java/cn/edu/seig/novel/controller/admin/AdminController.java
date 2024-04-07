@@ -33,6 +33,16 @@ public class AdminController {
         return bookService.listBooks();
     }
 
+    @DeleteMapping("/book/{id}")
+    public Result deleteBook(@PathVariable Long id) {
+        return adminService.deleteBook(id);
+    }
+
+    @GetMapping("/book/chapter/{chapterId}")
+    public Result getBookChapter(@PathVariable Long chapterId) {
+        return bookService.getBookChapter(chapterId);
+    }
+
     /*
     查询用户列表
      */

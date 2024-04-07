@@ -32,4 +32,6 @@ public interface AdminService {
     Result disableUser(Long id);
 
     Result deleteUser(Long id);
+
+    Result deleteBook(Long id);
 }

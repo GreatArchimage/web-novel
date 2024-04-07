@@ -188,4 +188,13 @@ public class AdminServiceImpl implements AdminService {
         }
         return Result.success("删除成功");
     }
+
+    @Override
+    public Result deleteBook(Long id) {
+        int i = bookInfoMapper.deleteById(id);
+        if (i == 0) {
+            return Result.fail("删除失败");
+        }
+        return Result.success("删除成功");
+    }
 }

@@ -220,6 +220,36 @@ public class BookServiceImpl implements BookService {
 
     }
 
+    @Override
+    public Result updateBook(BookInfo bookInfo) {
+        // 检查小说名是否重复
+        QueryWrapper<BookInfo> bookInfoQueryWrapper = new QueryWrapper<>();
+        bookInfoQueryWrapper.eq("book_name", bookInfo.getBookName())
+                .ne("id", bookInfo.getId());
+        if (bookInfoMapper.selectCount(bookInfoQueryWrapper) > 0) {
+            return Result.fail("小说名重复");
+        }
+        bookInfo.setUpdateTime(LocalDateTime.now());
+        bookInfoMapper.updateById(bookInfo);
+        return Result.success();
+    }
+
+    @Override
+    public Result deleteBook(Long bookId) {
+        // 删除小说
+        bookInfoMapper.deleteById(bookId);
+        // 删除小说章节
+        QueryWrapper<BookChapter> bookChapterQueryWrapper = new QueryWrapper<>();
+        bookChapterQueryWrapper.eq("book_id", bookId);
+        bookChapterMapper.delete(bookChapterQueryWrapper);
+        return Result.success();
+    }
+
+    @Override
+    public Result getBookChapter(Long chapterId) {
+        return Result.success(bookChapterMapper.selectById(chapterId));
+    }
+
     //Author End
 
     @Override
@@ -253,23 +283,26 @@ public class BookServiceImpl implements BookService {
                 .orderByDesc("chapter_num")
                 .last("limit 1");
         BookChapter lastChapter = bookChapterMapper.selectOne(bookChapterQueryWrapper);
+        BookChapterAboutRespDto bookChapterAboutRespDto = new BookChapterAboutRespDto();
+
         if (lastChapter == null) {
-            return Result.success("暂无章节", null);
+            bookChapterAboutRespDto.setChapterInfo(null);
+            bookChapterAboutRespDto.setChapterTotal(0L);
+            return Result.success("暂无章节", bookChapterAboutRespDto);
         }
         // 查询章节总数
         bookChapterQueryWrapper.clear();
         bookChapterQueryWrapper.eq("book_id", bookId);
         Long chapterTotal = bookChapterMapper.selectCount(bookChapterQueryWrapper);
 
-        BookChapterAboutRespDto bookChapterAboutRespDto = new BookChapterAboutRespDto();
         bookChapterAboutRespDto.setChapterInfo(lastChapter);
         bookChapterAboutRespDto.setChapterTotal(chapterTotal);
         int chapterContentLength = lastChapter.getChapterContent().length();
 
-        if(chapterContentLength<30){
+        if(chapterContentLength<200){
             bookChapterAboutRespDto.setContentSummary(lastChapter.getChapterContent());
         }else{
-            bookChapterAboutRespDto.setContentSummary(lastChapter.getChapterContent().substring(0, 30));
+            bookChapterAboutRespDto.setContentSummary(lastChapter.getChapterContent().substring(0, 200) + "...");
         }
         return Result.success(bookChapterAboutRespDto);
     }

@@ -56,6 +56,16 @@ public class AuthorController {
         return bookService.saveBook(newBook);
     }
 
+    @PutMapping("book")
+    public Result updateBook(@RequestBody BookInfo bookInfo) {
+        return bookService.updateBook(bookInfo);
+    }
+
+    @DeleteMapping("book/{bookId}")
+    public Result deleteBook(@PathVariable("bookId") Long bookId) {
+        return bookService.deleteBook(bookId);
+    }
+
     @GetMapping("book/chapters/{bookId}")
     public Result listBookChapters(@PathVariable("bookId") Long bookId, @ParameterObject PageReqParams pageReqParams) {
         return bookService.listBookChapters(bookId, pageReqParams);

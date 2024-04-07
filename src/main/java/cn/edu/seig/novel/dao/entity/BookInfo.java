@@ -47,9 +47,9 @@ public class BookInfo implements Serializable {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastChapterUpdateTime;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 
     public Long getId() {

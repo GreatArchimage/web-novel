@@ -62,9 +62,6 @@ public interface BookService {
 //
     /**
      * 增加小说点击量
-     *
-     * @param bookId 小说ID
-     * @return 成功状态
      */
     Result addVisitCount(Long bookId);
 
@@ -93,4 +90,10 @@ public interface BookService {
     Result removeBookFromBookshelf(Long userId, Long bookId);
 
     Result listAuthorBooks(PageReqParams params);
+
+    Result updateBook(BookInfo bookInfo);
+
+    Result deleteBook(Long bookId);
+
+    Result getBookChapter(Long chapterId);
 }
