@@ -20,7 +20,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(authInterceptor)
             .addPathPatterns("/api/front/user" + "/**",
                     "/api/author" + "/**",
-                    "/api/admin" + "/**")
+                    "/api/admin" + "/**",
+                    "/api/front/book/content" + "/**")
             .excludePathPatterns("/api/front/user" + "/register",
                 "/api/front/user" + "/login",
                     "/api/admin" + "/login")

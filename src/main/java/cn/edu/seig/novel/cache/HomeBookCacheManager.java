@@ -59,6 +59,10 @@ public class HomeBookCacheManager {
             bookRecommendDto.setPicUrl(bookInfo.getPicUrl());
             bookRecommendDto.setAuthorName(bookInfo.getAuthorName());
             bookRecommendDto.setIntro(bookInfo.getIntro());
+            bookRecommendDto.setSort(v.getSort());
+            bookRecommendDto.setScore(bookInfo.getScore());
+            bookRecommendDto.setCreateTime(v.getCreateTime());
+            bookRecommendDto.setUpdateTime(v.getUpdateTime());
             return bookRecommendDto;
         }).collect(Collectors.toList());
 

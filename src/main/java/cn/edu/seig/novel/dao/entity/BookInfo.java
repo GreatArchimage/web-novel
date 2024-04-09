@@ -30,7 +30,7 @@ public class BookInfo implements Serializable {
 
     private String intro;
 
-    private Integer score;
+    private Float score;
 
     private Integer bookStatus;
 
@@ -124,11 +124,11 @@ public class BookInfo implements Serializable {
         this.intro = intro;
     }
 
-    public Integer getScore() {
+    public Float getScore() {
         return score;
     }
 
-    public void setScore(Integer score) {
+    public void setScore(Float score) {
         this.score = score;
     }
 

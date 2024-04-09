@@ -87,6 +87,15 @@ public class AdminServiceImpl implements AdminService {
         BookRecommend newBookRecommend = new BookRecommend();
         newBookRecommend.setBookId(bookId);
         newBookRecommend.setType(recommendType);
+        // 设置排序为最大排序+1
+        QueryWrapper<BookRecommend> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("type", recommendType).orderByDesc("sort").last("limit 1");
+        BookRecommend maxSortBookRecommend = bookRecommendMapper.selectOne(queryWrapper);
+        if (maxSortBookRecommend == null){
+            newBookRecommend.setSort(1);
+        }else{
+            newBookRecommend.setSort(maxSortBookRecommend.getSort()+1);
+        }
         newBookRecommend.setCreateTime(LocalDateTime.now());
         newBookRecommend.setUpdateTime(LocalDateTime.now());
         int i = bookRecommendMapper.insert(newBookRecommend);

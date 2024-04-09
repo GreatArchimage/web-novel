@@ -1,5 +1,6 @@
 package cn.edu.seig.novel.dto.resp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 
@@ -17,6 +18,6 @@ public class BookshelfContentRespDto implements Serializable {
     private String authorName;
     private Long preChapterId;
     private String preChapterName;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 }

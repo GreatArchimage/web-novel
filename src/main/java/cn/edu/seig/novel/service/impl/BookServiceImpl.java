@@ -33,6 +33,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
 
+    private final AuthorInfoMapper authorInfoMapper;
+
     private final BookInfoMapper bookInfoMapper;
 
     private final BookChapterMapper bookChapterMapper;
@@ -120,7 +122,12 @@ public class BookServiceImpl implements BookService {
         if (bookInfoMapper.selectCount(bookInfoQueryWrapper) > 0) {
             return Result.fail("小说名重复");
         }
-        newBook.setAuthorId(UserHolder.getAuthorId());
+        Long authorId = UserHolder.getAuthorId();
+        AuthorInfo authorInfo = authorInfoMapper.selectById(authorId);
+        newBook.setAuthorId(authorId);
+        newBook.setAuthorName(authorInfo.getPenName());
+        BookCategory bookCategory = bookCategoryMapper.selectById(newBook.getCategoryId());
+        newBook.setCategoryName(bookCategory.getName());
         newBook.setCreateTime(LocalDateTime.now());
         newBook.setUpdateTime(LocalDateTime.now());
 
@@ -231,6 +238,7 @@ public class BookServiceImpl implements BookService {
         }
         bookInfo.setUpdateTime(LocalDateTime.now());
         bookInfoMapper.updateById(bookInfo);
+        bookInfoCacheManager.evictBookInfoCache(bookInfo.getId());
         return Result.success();
     }
 
@@ -358,6 +366,18 @@ public class BookServiceImpl implements BookService {
 //        BookInfo bookInfo = bookInfoMapper.selectById(bookChapter.getBookId());
         BookChapter bookChapter = bookChapterCacheManager.getBookChapter(chapterId);
         BookInfo bookInfo = bookInfoCacheManager.getBookInfo(bookChapter.getBookId());
+        // 如果当前书籍在书架中，更新最近阅读章节
+        QueryWrapper<UserBookshelf> queryWrapper = new QueryWrapper<>();
+        Long userId = UserHolder.getUserId();
+        queryWrapper.eq("book_id", bookInfo.getId()).eq("user_id", userId)
+                        .last("limit 1");
+        UserBookshelf userBookshelf = userBookshelfMapper.selectOne(queryWrapper);
+        if(userBookshelf != null){
+            userBookshelf.setPreChapterId(chapterId);
+            userBookshelf.setUpdateTime(LocalDateTime.now());
+            userBookshelfMapper.updateById(userBookshelf);
+            bookInfoCacheManager.evictBookShelfCache(UserHolder.getUserId());
+        }
         return Result.success(BookContentAboutRespDto.builder()
                 .bookInfo(bookInfo)
                 .bookContent(bookChapter.getChapterContent())
@@ -425,7 +445,12 @@ public class BookServiceImpl implements BookService {
         // 更新小说评论数和评分
         BookInfo bookInfo = bookInfoMapper.selectById(bookComment.getBookId());
         bookInfo.setCommentCount(bookInfo.getCommentCount() + 1);
-        bookInfo.setScore((bookInfo.getScore() * (bookInfo.getCommentCount() - 1) + bookComment.getRate()) / bookInfo.getCommentCount());
+        if (bookInfo.getScore() == null) {
+            bookInfo.setScore(bookComment.getRate());
+        } else {
+            bookInfo.setScore((bookInfo.getScore() * (bookInfo.getCommentCount() - 1) + bookComment.getRate()) / bookInfo.getCommentCount());
+        }
+//        bookInfo.setScore((bookInfo.getScore() * (bookInfo.getCommentCount() - 1) + bookComment.getRate()) / bookInfo.getCommentCount());
         bookInfoMapper.updateById(bookInfo);
         return Result.success();
     }
@@ -457,9 +482,14 @@ public class BookServiceImpl implements BookService {
             // 用户已加入书架
             return Result.fail("您已加入书架");
         }
+        BookChapter firstChapter = bookChapterMapper
+                .selectOne(new QueryWrapper<BookChapter>().eq("book_id", bookId)
+                        .orderByAsc("chapter_num")
+                        .last("limit 1"));
         UserBookshelf userBookshelf = new UserBookshelf();
         userBookshelf.setUserId(userId);
         userBookshelf.setBookId(bookId);
+        userBookshelf.setPreChapterId(firstChapter.getId());
         userBookshelf.setCreateTime(LocalDateTime.now());
         userBookshelf.setUpdateTime(LocalDateTime.now());
         userBookshelfMapper.insert(userBookshelf);

@@ -4,7 +4,8 @@
 
     <select id="searchBooks" resultType="cn.edu.seig.novel.dao.entity.BookInfo">
         select
-        id,category_id,category_name,book_name,author_id,author_name,word_count,last_chapter_name
+        id,category_id,category_name,book_name,author_id,author_name,word_count,
+        last_chapter_name,last_chapter_update_time,book_status,visit_count,score
         from book_info where word_count > 0
         <if test="condition.keyword != null and condition.keyword != ''">
             and (book_name like concat('%',#{condition.keyword},'%') or author_name like

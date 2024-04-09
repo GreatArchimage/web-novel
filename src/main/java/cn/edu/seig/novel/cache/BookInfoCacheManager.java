@@ -60,6 +60,11 @@ public class BookInfoCacheManager {
         return bookInfo;
     }
 
+    @CacheEvict(value = "bookInfo", key = "#bookId")
+    public void evictBookInfoCache(Long bookId) {
+
+    }
+
     @Cacheable(value = "bookShelf")
     public List<BookshelfContentRespDto> getBooksFromBookShelf(Long userId) {
         QueryWrapper<UserBookshelf> queryWrapper = new QueryWrapper<>();

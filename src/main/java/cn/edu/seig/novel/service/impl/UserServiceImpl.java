@@ -3,6 +3,7 @@ package cn.edu.seig.novel.service.impl;
 import cn.edu.seig.novel.cache.VerifyCodeCacheManager;
 import cn.edu.seig.novel.common.http.Result;
 import cn.edu.seig.novel.common.utils.JwtUtils;
+import cn.edu.seig.novel.dao.entity.SysUser;
 import cn.edu.seig.novel.dao.entity.UserInfo;
 import cn.edu.seig.novel.dao.mapper.UserInfoMapper;
 import cn.edu.seig.novel.dto.UserRegisterReqDto;

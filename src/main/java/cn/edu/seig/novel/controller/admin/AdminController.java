@@ -4,6 +4,7 @@ import cn.edu.seig.novel.common.http.Result;
 import cn.edu.seig.novel.common.utils.PageReqParams;
 import cn.edu.seig.novel.dao.entity.BookCategory;
 import cn.edu.seig.novel.dao.entity.SysUser;
+import cn.edu.seig.novel.dao.entity.UserInfo;
 import cn.edu.seig.novel.service.AdminService;
 import cn.edu.seig.novel.service.BookService;
 import cn.edu.seig.novel.service.HomeService;
@@ -54,9 +55,17 @@ public class AdminController {
     /*
     禁用用户
      */
-    @PutMapping("/user/disable/{id}")
-    public Result disableUser(@PathVariable Long id) {
-        return adminService.disableUser(id);
+//    @PutMapping("/user/disable/{id}")
+//    public Result disableUser(@PathVariable Long id) {
+//        return adminService.disableUser(id);
+//    }
+
+    /*
+    更新普通用户
+     */
+    @PutMapping("/user")
+    public Result updateUserInfo(@RequestBody UserInfo user) {
+        return userService.updateUserInfo(user);
     }
 
     @DeleteMapping("/user/{id}")

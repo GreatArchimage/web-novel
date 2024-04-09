@@ -51,6 +51,11 @@ public class AuthorController {
         return bookService.listAuthorBooks(pageReqParams);
     }
 
+    @GetMapping("/book/{bookId}")
+    public Result getBookInfo(@PathVariable Long bookId){
+        return bookService.getBookById(bookId);
+    }
+
     @PostMapping("book")
     public Result publishBook(@RequestBody BookInfo newBook) {
         return bookService.saveBook(newBook);

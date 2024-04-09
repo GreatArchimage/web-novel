@@ -1,8 +1,10 @@
 package cn.edu.seig.novel.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Data
 public class BookRecommendDto implements Serializable {
@@ -22,4 +24,12 @@ public class BookRecommendDto implements Serializable {
     private String authorName;
 
     private String intro;
+
+    private Integer sort;
+
+    private Float score;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updateTime;
 }

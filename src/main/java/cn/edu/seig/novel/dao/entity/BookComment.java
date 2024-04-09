@@ -20,7 +20,7 @@ public class BookComment implements Serializable {
 
     private String commentContent;
 
-    private Integer rate;
+    private Float rate;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -74,11 +74,11 @@ public class BookComment implements Serializable {
         this.updateTime = updateTime;
     }
 
-    public Integer getRate() {
+    public Float getRate() {
         return rate;
     }
 
-    public void setRate(Integer rate) {
+    public void setRate(Float rate) {
         this.rate = rate;
     }
 
