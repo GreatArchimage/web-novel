@@ -1,5 +1,6 @@
 package cn.edu.seig.novel.service.impl;
 
+import cn.edu.seig.novel.cache.HomeBookCacheManager;
 import cn.edu.seig.novel.common.http.Result;
 import cn.edu.seig.novel.common.utils.JwtUtils;
 import cn.edu.seig.novel.common.utils.PageReqParams;
@@ -35,6 +36,10 @@ public class AdminServiceImpl implements AdminService {
     private final BookCategoryMapper bookCategoryMapper;
 
     private final SysUserRoleMapper sysUserRoleMapper;
+
+    private final HomeBookCacheManager homeBookCacheManager;
+
+    private final AuthorInfoMapper authorInfoMapper;
 
     @Override
     public Result login(SysUser sysUser) {
@@ -102,6 +107,7 @@ public class AdminServiceImpl implements AdminService {
         if (i == 0) {
             return Result.fail("添加失败");
         }
+        homeBookCacheManager.evictHomeBooksCache();
         return Result.success("添加成功");
     }
 
@@ -111,6 +117,7 @@ public class AdminServiceImpl implements AdminService {
         if (i == 0) {
             return Result.fail("删除失败");
         }
+        homeBookCacheManager.evictHomeBooksCache();
         return Result.success("删除成功");
     }
 
@@ -205,5 +212,28 @@ public class AdminServiceImpl implements AdminService {
             return Result.fail("删除失败");
         }
         return Result.success("删除成功");
+    }
+
+    @Override
+    public Result listAuthors() {
+        QueryWrapper<AuthorInfo> queryWrapper = new QueryWrapper<>();
+        List<AuthorInfo> authorInfos = authorInfoMapper.selectList(queryWrapper);
+        return Result.success(authorInfos);
+    }
+
+    @Override
+    public Result deleteAuthor(Long id) {
+        int i = authorInfoMapper.deleteById(id);
+        if (i == 0) {
+            return Result.fail("删除失败");
+        }
+        return Result.success("删除成功");
+    }
+
+    @Override
+    public Result updateAuthorInfo(AuthorInfo author) {
+        author.setUpdateTime(LocalDateTime.now());
+        authorInfoMapper.updateById(author);
+        return Result.success();
     }
 }

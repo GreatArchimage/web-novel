@@ -15,9 +15,6 @@ public class PageReqParams {
      */
     private int pageSize = 10;
 
-    /**
-     * 是否查询所有，默认不查所有 为 true 时，pageNum 和 pageSize 无效
-     */
     private boolean fetchAll = false;
 
 }

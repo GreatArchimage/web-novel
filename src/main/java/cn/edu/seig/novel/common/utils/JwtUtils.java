@@ -17,24 +17,12 @@ import java.util.Objects;
 @Component
 public class JwtUtils {
 
-    /**
-     * 注入JWT加密密钥
-     */
     @Value("${novel.jwt.secret}")
     private String secret;
 
-    /**
-     * 定义系统标识头常量
-     */
     private static final String HEADER_SYSTEM_KEY = "systemKeyHeader";
 
-    /**
-     * 根据用户ID生成JWT
-     *
-     * @param uid       用户ID
-     * @param systemKey 系统标识
-     * @return JWT
-     */
+    // 根据用户ID生成JWT
     public String generateToken(Long uid, String systemKey) {
         return Jwts.builder()
             .setHeaderParam(HEADER_SYSTEM_KEY, systemKey)
@@ -43,13 +31,7 @@ public class JwtUtils {
             .compact();
     }
 
-    /**
-     * 解析JWT返回用户ID
-     *
-     * @param token     JWT
-     * @param systemKey 系统标识
-     * @return 用户ID
-     */
+    // 解析JWT返回用户ID
     public Long parseToken(String token, String systemKey) {
         Jws<Claims> claimsJws;
         try {
@@ -57,15 +39,12 @@ public class JwtUtils {
                 .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
                 .build()
                 .parseClaimsJws(token);
-            // OK, we can trust this JWT
             // 判断该 JWT 是否属于指定系统
             if (Objects.equals(claimsJws.getHeader().get(HEADER_SYSTEM_KEY), systemKey)) {
                 return Long.parseLong(claimsJws.getBody().getSubject());
             }
         } catch (JwtException e) {
-//            log.warn("JWT解析失败:{}", token);
             System.out.println("JWT解析失败:" + token);
-            // don't trust the JWT!
         }
         return null;
     }

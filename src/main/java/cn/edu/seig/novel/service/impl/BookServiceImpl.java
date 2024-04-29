@@ -88,6 +88,7 @@ public class BookServiceImpl implements BookService {
         // 组装响应对象
         BookInfoRespDto bookInfoRespDto = new BookInfoRespDto();
         bookInfoRespDto.setId(bookInfo.getId());
+        bookInfoRespDto.setWorkDirection(bookInfo.getWorkDirection());
         bookInfoRespDto.setBookName(bookInfo.getBookName());
         bookInfoRespDto.setIntro(bookInfo.getIntro());
         bookInfoRespDto.setBookStatus(bookInfo.getBookStatus());
@@ -155,8 +156,6 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Result saveBookChapter(BookChapter newChapter) {
-        //TODO 检验作品是否属于当前作者
-
         //查询最新章节号
         QueryWrapper<BookChapter> bookChapterQueryWrapper = new QueryWrapper<>();
         bookChapterQueryWrapper.eq("book_id", newChapter.getBookId())

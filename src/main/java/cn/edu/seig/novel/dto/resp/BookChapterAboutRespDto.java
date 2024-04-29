@@ -15,7 +15,7 @@ public class BookChapterAboutRespDto {
     private Long chapterTotal;
 
     /**
-     * 内容概要（30字）
+     * 内容概要
      */
     private String contentSummary;
 

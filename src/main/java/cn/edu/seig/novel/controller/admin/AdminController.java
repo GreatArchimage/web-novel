@@ -2,6 +2,7 @@ package cn.edu.seig.novel.controller.admin;
 
 import cn.edu.seig.novel.common.http.Result;
 import cn.edu.seig.novel.common.utils.PageReqParams;
+import cn.edu.seig.novel.dao.entity.AuthorInfo;
 import cn.edu.seig.novel.dao.entity.BookCategory;
 import cn.edu.seig.novel.dao.entity.SysUser;
 import cn.edu.seig.novel.dao.entity.UserInfo;
@@ -141,5 +142,20 @@ public class AdminController {
     @DeleteMapping("/sysUser/{id}")
     public Result deleteSysUser(@PathVariable Long id) {
         return adminService.deleteSysUser(id);
+    }
+
+    @GetMapping("/author/list")
+    public Result listAuthors() {
+        return adminService.listAuthors();
+    }
+
+    @DeleteMapping("/author/{id}")
+    public Result deleteAuthor(@PathVariable Long id) {
+        return adminService.deleteAuthor(id);
+    }
+
+    @PutMapping("/author")
+    public Result updateAuthorInfo(@RequestBody AuthorInfo authorInfo) {
+        return adminService.updateAuthorInfo(authorInfo);
     }
 }

@@ -9,9 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * 小说信息 响应DTO
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,6 +19,11 @@ public class BookInfoRespDto {
      * ID
      */
     private Long id;
+
+    /**
+     * 作品频道
+     */
+    private Integer workDirection;
 
     /**
      * 类别ID

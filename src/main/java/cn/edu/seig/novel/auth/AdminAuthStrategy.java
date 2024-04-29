@@ -12,9 +12,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 
-/**
- * 平台后台管理系统 认证授权策略
- */
 @Component
 @RequiredArgsConstructor
 public class AdminAuthStrategy implements AuthStrategy {

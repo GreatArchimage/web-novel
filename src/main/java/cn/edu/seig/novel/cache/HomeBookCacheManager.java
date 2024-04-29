@@ -8,6 +8,7 @@ import cn.edu.seig.novel.dao.mapper.BookRecommendMapper;
 import cn.edu.seig.novel.dto.BookRecommendDto;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -36,9 +37,8 @@ public class HomeBookCacheManager {
     @Cacheable(value = "bookRecommend")
     public List<BookRecommendDto> listHomeBooks() {
         QueryWrapper<BookRecommend> queryWrapper = new QueryWrapper<>();
-        queryWrapper.orderByDesc("sort");
+        queryWrapper.orderByAsc("sort");
         List<BookRecommend> bookRecommends = bookRecommendMapper.selectList(queryWrapper);
-
         List<Long> bookIds = new ArrayList<>();
         for (BookRecommend bookRecommend : bookRecommends) {
             Long bookId = bookRecommend.getBookId();
@@ -47,8 +47,8 @@ public class HomeBookCacheManager {
         QueryWrapper<BookInfo> bookInfoQueryWrapper = new QueryWrapper<>();
         bookInfoQueryWrapper.in("id", bookIds);
         List<BookInfo> bookInfos = bookInfoMapper.selectList(bookInfoQueryWrapper);
-
-        Map<Long, BookInfo> bookInfoMap = bookInfos.stream().collect(Collectors.toMap(BookInfo::getId, Function.identity()));
+        Map<Long, BookInfo> bookInfoMap = bookInfos.stream()
+                .collect(Collectors.toMap(BookInfo::getId, Function.identity()));
         List<BookRecommendDto> bookRecommendDtos = bookRecommends.stream().map(v -> {
             BookInfo bookInfo = bookInfoMap.get(v.getBookId());
             BookRecommendDto bookRecommendDto = new BookRecommendDto();
@@ -65,8 +65,11 @@ public class HomeBookCacheManager {
             bookRecommendDto.setUpdateTime(v.getUpdateTime());
             return bookRecommendDto;
         }).collect(Collectors.toList());
-
         return bookRecommendDtos;
+    }
+
+    @CacheEvict(value = "bookRecommend")
+    public void evictHomeBooksCache() {
     }
 
 }

@@ -26,7 +26,7 @@ mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
---- #---------------------自定义配置----------------------------
+--- #---------------------------------------------
 novel:
   # 跨域配置
   cors:
@@ -39,7 +39,6 @@ novel:
   jwt:
     secret: E66559580A1ADF48CDD928516062F12E
   file:
-    # 文件上传配置
     upload:
       # 上传路径
       path: D:/temp/novel/upload

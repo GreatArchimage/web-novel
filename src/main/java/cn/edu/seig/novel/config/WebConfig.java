@@ -1,7 +1,6 @@
 package cn.edu.seig.novel.config;
 
 import cn.edu.seig.novel.interceptor.AuthInterceptor;
-import cn.edu.seig.novel.interceptor.TokenParseInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

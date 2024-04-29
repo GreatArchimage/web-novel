@@ -19,7 +19,6 @@ public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        // 允许的域,不要写*，否则cookie就无法使用了
         for (String allowOrigin : corsProperties.getAllowOrigins()) {
             config.addAllowedOrigin(allowOrigin);
         }

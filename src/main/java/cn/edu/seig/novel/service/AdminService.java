@@ -2,8 +2,10 @@ package cn.edu.seig.novel.service;
 
 import cn.edu.seig.novel.common.http.Result;
 import cn.edu.seig.novel.common.utils.PageReqParams;
+import cn.edu.seig.novel.dao.entity.AuthorInfo;
 import cn.edu.seig.novel.dao.entity.BookCategory;
 import cn.edu.seig.novel.dao.entity.SysUser;
+import cn.edu.seig.novel.dao.entity.UserInfo;
 
 public interface AdminService {
 
@@ -34,4 +36,10 @@ public interface AdminService {
     Result deleteUser(Long id);
 
     Result deleteBook(Long id);
+
+    Result listAuthors();
+
+    Result deleteAuthor(Long id);
+
+    Result updateAuthorInfo(AuthorInfo author);
 }
