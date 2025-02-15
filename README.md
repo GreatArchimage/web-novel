@@ -1,7 +1,7 @@
 ## 相关项目
 + 小说在线阅读平台-后端：https://github.com/GreatArchimage/web-novel
-+ 小说在线阅读平台-用户端：https://github.com/GreatArchimage/web-novel
-+ 小说在线阅读平台-管理员端：https://github.com/GreatArchimage/web-novel
++ 小说在线阅读平台-用户端：https://github.com/GreatArchimage/react-novel
++ 小说在线阅读平台-管理端：https://github.com/GreatArchimage/react-novel-admin
 
 ## 项目预览
 ![image](https://github.com/user-attachments/assets/1d4b42b9-23ec-4d02-900d-3980ecb311be)
